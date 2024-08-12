@@ -78,5 +78,8 @@ jobs:
         files: |
           ./build/ValleyCast.dll
           ./build/manifest.json
+        tag_name: ${{ env.NEW_TAG }}
+        name: "Release ${{ env.NEW_TAG }}"
+        body: "Automatic release of version ${{ env.NEW_TAG }}."
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
