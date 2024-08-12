@@ -24,6 +24,9 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore ValleyCast.csproj
 
+    - name: List NuGet packages
+      run: ls -R /home/runner/.nuget/packages/pathoschild.stardew.modbuildconfig
+
     - name: Set up dummy game path
       run: mkdir -p /home/runner/work/game_path
 
