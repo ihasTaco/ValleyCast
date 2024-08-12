@@ -73,13 +73,10 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Create GitHub Release and Upload Assets
-      uses: softprops/action-gh-release@v1.21.0
+      uses: softprops/action-gh-release@v1
       with:
         files: |
           ./build/ValleyCast.dll
           ./build/manifest.json
-        tag_name: ${{ env.NEW_TAG }}
-        name: "Release ${{ env.NEW_TAG }}"
-        body: "Automatic release of version ${{ env.NEW_TAG }}."
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
