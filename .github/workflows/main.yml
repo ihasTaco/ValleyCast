@@ -37,6 +37,7 @@ jobs:
     - name: Build the project
       run: |
         export GamePath=/home/runner/work/game_path
+        export MSBUILDDISABLEREALPATH=1
         dotnet build ValleyCast.csproj --configuration Release --no-restore --verbosity diagnostic
 
     - name: Publish build artifacts
