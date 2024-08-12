@@ -38,7 +38,7 @@ jobs:
       run: |
         export GamePath=/home/runner/work/game_path
         export MSBUILDDISABLEREALPATH=1
-        dotnet build ValleyCast.csproj --configuration Release --no-restore --verbosity diagnostic
+        dotnet build ValleyCast.csproj --configuration Release --no-restore
 
     - name: Publish build artifacts
       uses: actions/upload-artifact@v3
