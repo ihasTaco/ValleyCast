@@ -28,6 +28,9 @@ jobs:
       run: |
         mkdir -p Assemblies
         cp .github/Assemblies/* Assemblies/
+    
+    - name: Set Assembly Search Path
+      run: export DOTNET_ADDITIONAL_DEPS=Assemblies
 
     - name: Build the project
       run: dotnet build ValleyCast.csproj --configuration Release --no-restore
