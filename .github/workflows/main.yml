@@ -1,4 +1,4 @@
-name: Build
+name: Build and Release
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  build:
+  build-and-release:
     runs-on: ubuntu-latest
 
     steps:
@@ -37,11 +37,68 @@ jobs:
         export MSBUILDDISABLEREALPATH=1
         dotnet build ValleyCast.csproj --configuration Release --no-restore
 
-    - name: List build output
-      run: ls -R ./build/
+    - name: Determine next version
+      id: get-version
+      run: |
+        git fetch --tags
+        TAG=$(git tag --sort=-v:refname | head -n 1)
+        echo "Latest tag: $TAG"
 
-    - name: Publish build artifacts
-      uses: actions/upload-artifact@v3
+        if [[ -z "$TAG" ]]; then
+          # If no tags found, start from 0.0.0
+          NEW_TAG="v0.0.1"
+        else
+          # Split the tag into an array by '.' and increment the last element
+          IFS='.' read -r -a VERSION_PARTS <<< "${TAG//v/}"
+          MAJOR=${VERSION_PARTS[0]}
+          MINOR=${VERSION_PARTS[1]}
+          PATCH=${VERSION_PARTS[2]}
+          
+          # Increment patch version by default
+          PATCH=$((PATCH + 1))
+          
+          NEW_TAG="v$MAJOR.$MINOR.$PATCH"
+        fi
+
+        echo "New tag will be: $NEW_TAG"
+        echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+
+    - name: Create new tag
+      run: |
+        git config --local user.name "GitHub Actions"
+        git config --local user.email "actions@github.com"
+        git tag $NEW_TAG
+        git push origin $NEW_TAG
+      env:
+        NEW_TAG: ${{ env.NEW_TAG }}
+
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
       with:
-        name: ModBuild
-        path: ./build/
+        tag_name: ${{ env.NEW_TAG }}
+        release_name: "Release ${{ env.NEW_TAG }}"
+        body: "Automatic release of version ${{ env.NEW_TAG }}."
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload build artifacts to release
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.get-version.outputs.upload_url }}
+        asset_path: ./build/ValleyCast.dll
+        asset_name: ValleyCast.dll
+        asset_content_type: application/octet-stream
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload manifest to release
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.get-version.outputs.upload_url }}
+        asset_path: ./build/manifest.json
+        asset_name: manifest.json
+        asset_content_type: application/json
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
