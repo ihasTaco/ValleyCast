@@ -22,7 +22,7 @@ jobs:
         dotnet-version: '6.0.x'
 
     - name: Restore dependencies
-      run: dotnet restore ValleyCast.csproj
+      run: dotnet restore src/ValleyCast.csproj
 
     - name: Set up dummy game path
       run: mkdir -p /home/runner/work/game_path
@@ -35,7 +35,7 @@ jobs:
       run: |
         export GamePath=/home/runner/work/game_path
         export MSBUILDDISABLEREALPATH=1
-        dotnet build ValleyCast.csproj --configuration Release --no-restore
+        dotnet build src/ValleyCast.csproj --configuration Release --no-restore
 
     - name: List build output
       run: ls -R /Release/
