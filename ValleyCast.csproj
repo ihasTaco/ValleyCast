@@ -4,11 +4,24 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GamePath>/home/runner/work/game_path</GamePath>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
     <PackageReference Include="websocketsharp.core" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="SMAPI">
+      <HintPath>$(GamePath)/StardewModdingAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="SMAPI.Toolkit.CoreInterfaces">
+      <HintPath>$(GamePath)/SMAPI.Toolkit.CoreInterfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="StardewValley">
+      <HintPath>$(GamePath)/Stardew Valley.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
