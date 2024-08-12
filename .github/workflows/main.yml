@@ -35,14 +35,13 @@ jobs:
       run: |
         export GamePath=/home/runner/work/game_path
         export MSBUILDDISABLEREALPATH=1
-        dotnet build ValleyCast.csproj --configuration --no-restore
+        dotnet build ValleyCast.csproj --configuration Release --no-restore
 
     - name: List build output
-      run: ls -R /build/
-
+      run: ls -R build/
+      
     - name: Publish build artifacts
       uses: actions/upload-artifact@v3
       with:
         name: ModBuild
-        path: |
-          /build/
+        path: build/
