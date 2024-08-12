@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\johnl\\source\\repos\\ValleyCast\\ValleyCast\\ValleyCast.csproj": {}
+    "C:\\Users\\johnl\\source\\repos\\ihasTaco\\ValleyCast\\ValleyCast.csproj": {}
   },
   "projects": {
-    "C:\\Users\\johnl\\source\\repos\\ValleyCast\\ValleyCast\\ValleyCast.csproj": {
+    "C:\\Users\\johnl\\source\\repos\\ihasTaco\\ValleyCast\\ValleyCast.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\johnl\\source\\repos\\ValleyCast\\ValleyCast\\ValleyCast.csproj",
+        "projectUniqueName": "C:\\Users\\johnl\\source\\repos\\ihasTaco\\ValleyCast\\ValleyCast.csproj",
         "projectName": "ValleyCast",
-        "projectPath": "C:\\Users\\johnl\\source\\repos\\ValleyCast\\ValleyCast\\ValleyCast.csproj",
+        "projectPath": "C:\\Users\\johnl\\source\\repos\\ihasTaco\\ValleyCast\\ValleyCast.csproj",
         "packagesPath": "C:\\Users\\johnl\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\johnl\\source\\repos\\ValleyCast\\ValleyCast\\obj\\",
+        "outputPath": "C:\\Users\\johnl\\source\\repos\\ihasTaco\\ValleyCast\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\johnl\\AppData\\Roaming\\NuGet\\NuGet.Config",
