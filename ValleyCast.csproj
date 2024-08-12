@@ -12,4 +12,16 @@
     <PackageReference Include="websocketsharp.core" Version="1.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="SMAPI">
+      <HintPath>$(GamePath)/StardewModdingAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="SMAPI.Toolkit.CoreInterfaces">
+      <HintPath>$(GamePath)/SMAPI.Toolkit.CoreInterfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="StardewValley">
+      <HintPath>$(GamePath)/Stardew Valley.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
