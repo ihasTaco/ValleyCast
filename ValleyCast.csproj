@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GamePath>/home/runner/work/game_path</GamePath>
-    <BaseOutputPath>\build</BaseOutputPath>
+	  <BaseOutputPath>./build/</BaseOutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
