@@ -1,35 +1,108 @@
-name: Build and Test Stardew Valley Mod
+name: Build and Release Mod
 
+# This workflow is triggered manually from the GitHub Actions tab.
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'The semantic release version'
+        required: false
+        default: 'auto-fetch'
+        type: string
+      pre-release:
+        description: 'Set as pre-release (e.g., beta or alpha)'
+        required: false
+        default: 'auto'
+        type: choice
+        options:
+          - auto
+          - true
+          - false
+      set-latest:
+        description: 'Set as latest on GitHub'
+        required: false
+        default: false
+        type: boolean
+      github-upload:
+        description: 'Whether to upload on GitHub or not'
+        required: false
+        default: true
+        type: boolean
 
 jobs:
   build:
+    name: Build Mod
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup .NET 6.0
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '6.0.x'
+      - name: Setup .NET 6.0
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '6.0.x'
 
-    - name: Install dependencies
-      run: dotnet restore
+      - name: Install dependencies
+        run: dotnet restore
 
-    - name: Build project
-      run: dotnet build --configuration Release --no-restore /p:GamePath=/fakepath
+      - name: Build project
+        run: dotnet build --configuration Release --no-restore /p:GamePath=/fakepath
 
-    - name: Publish mod
-      run: dotnet publish --configuration Release --output ./ModOutput /p:GamePath=/fakepath
+      - name: Publish mod
+        run: dotnet publish --configuration Release --output ./ModOutput /p:GamePath=/fakepath
 
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: stardew-mod-build
-        path: ./ModOutput/
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: stardew-mod-build
+          path: ./ModOutput/
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    if: inputs.github-upload == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: stardew-mod-build
+          path: act_out/
+
+      - name: Set environment variables
+        run: |
+          if [ "${{ inputs.version }}" != "auto-fetch" ]; then
+            echo "RELEASE_TAG=${{ inputs.version }}" >> $GITHUB_ENV
+          else
+            echo "RELEASE_TAG=v$(jq -r '.Version' ./ModOutput/manifest.json)" >> $GITHUB_ENV
+          fi
+          if [ "${{ inputs.pre-release }}" == "auto" ]; then
+            if [[ ${{ env.RELEASE_TAG }} == *'beta'* ]] || [[ ${{ env.RELEASE_TAG }} == *'alpha'* ]]; then
+              echo "PRE_RELEASE=true" >> $GITHUB_ENV
+            else
+              echo "PRE_RELEASE=false" >> $GITHUB_ENV
+            fi
+          else
+            echo "PRE_RELEASE=${{ inputs.pre-release }}" >> $GITHUB_ENV
+          fi
+
+      - name: Rename build zip files (if needed)
+        if: inputs.version != 'auto-fetch'
+        run: |
+          for f in act_out/*zip; do
+            new_name=act_out/stardew-mod-${{ env.RELEASE_TAG }}.zip
+            mv "${f}" "${new_name}"
+          done
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: ./ModOutput/changelog.txt
+          prerelease: ${{ env.PRE_RELEASE }}
+          files: ./ModOutput/*.zip
+          tag_name: ${{ env.RELEASE_TAG }}
+          generate_release_notes: true
+          make_latest: ${{ inputs.set-latest }}
