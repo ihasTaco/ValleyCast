@@ -35,23 +35,21 @@ jobs:
       run: |
         cp -r .github/Assemblies/* /home/runner/work/game_path/
 
-    - name: Build the project
-      run: |
-        export GamePath=/home/runner/work/game_path
-        export MSBUILDDISABLEREALPATH=1
-        dotnet build ValleyCast.csproj --configuration Release --no-restore
-
     - name: Create release directory
       run: mkdir -p release
 
-    - name: Move build artifacts to release directory
+    - name: Build the project into the release directory
       run: |
-        mv ValleyCast/bin/Release/net6.0/ValleyCast.dll ./release/
-        cp manifest.json ./release/
+        export GamePath=/home/runner/work/game_path
+        export MSBUILDDISABLEREALPATH=1
+        dotnet build ValleyCast.csproj --configuration Release --output ./build --no-restore
 
-    - name: Zip release files
+    - name: Copy manifest.json to release directory
+      run: cp manifest.json ./build/
+
+    - name: Zip build files
       run: |
-        cd release
+        cd build
         zip -r ../ValleyCast.zip .
 
     - name: Determine next version
