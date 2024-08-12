@@ -7,8 +7,6 @@
     <GamePath>/home/runner/work/game_path</GamePath>
   </PropertyGroup>
 
-  <Import Project="$(NuGetPackageRoot)pathoschild.stardew.modbuildconfig/4.1.1/build/Pathoschild.Stardew.ModBuildConfig.targets" Condition="Exists('$(NuGetPackageRoot)pathoschild.stardew.modbuildconfig/4.1.1/build/Pathoschild.Stardew.ModBuildConfig.targets')" />
-
   <ItemGroup>
     <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
     <PackageReference Include="websocketsharp.core" Version="1.0.0" />
