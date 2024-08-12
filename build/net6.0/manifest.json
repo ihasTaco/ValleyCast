@@ -1,0 +1,15 @@
+{
+    "Name": "ValleyCast",
+    "Author": "ihasTaco",
+    "Version": "1.0.0",
+    "Description": "Control OBS automatically based on in-game events",
+    "UniqueID": "ihasTaco.ValleyCast",
+    "EntryDll": "ValleyCast.dll",
+    "MinimumApiVersion": "4.0.0",
+    "Dependencies": [
+        {
+            "UniqueID": "spacechase0.GenericModConfigMenu",
+            "IsRequired": true
+        }
+    ]
+}
