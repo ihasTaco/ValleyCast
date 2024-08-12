@@ -8,6 +8,10 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+  actions: write
+
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
@@ -45,18 +49,13 @@ jobs:
         echo "Latest tag: $TAG"
 
         if [[ -z "$TAG" ]]; then
-          # If no tags found, start from 0.0.0
           NEW_TAG="v0.0.1"
         else
-          # Split the tag into an array by '.' and increment the last element
           IFS='.' read -r -a VERSION_PARTS <<< "${TAG//v/}"
           MAJOR=${VERSION_PARTS[0]}
           MINOR=${VERSION_PARTS[1]}
           PATCH=${VERSION_PARTS[2]}
-          
-          # Increment patch version by default
           PATCH=$((PATCH + 1))
-          
           NEW_TAG="v$MAJOR.$MINOR.$PATCH"
         fi
 
@@ -71,6 +70,7 @@ jobs:
         git push origin $NEW_TAG
       env:
         NEW_TAG: ${{ env.NEW_TAG }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Create GitHub Release
       uses: actions/create-release@v1
