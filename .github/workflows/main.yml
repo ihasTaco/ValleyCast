@@ -24,9 +24,6 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore ValleyCast.csproj
 
-    - name: List NuGet packages
-      run: ls -R /home/runner/.nuget/packages/pathoschild.stardew.modbuildconfig
-
     - name: Set up dummy game path
       run: mkdir -p /home/runner/work/game_path
 
@@ -40,9 +37,12 @@ jobs:
         export MSBUILDDISABLEREALPATH=1
         dotnet build ValleyCast.csproj --configuration Release --no-restore
 
+    - name: List build output
+      run: ls -R ValleyCast/bin/Release/net6.0/
+
     - name: Publish build artifacts
       uses: actions/upload-artifact@v3
       with:
         name: ModBuild
         path: |
-          bin/Release/net6.0/
+          Release/
