@@ -24,16 +24,18 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore ValleyCast.csproj
 
-    - name: Copy necessary assemblies
+    - name: Set up dummy game path
+      run: mkdir -p /home/runner/work/game_path
+
+    - name: Copy necessary assemblies to dummy game path
       run: |
-        mkdir -p Assemblies
-        cp .github/Assemblies/* Assemblies/
-    
-    - name: Set Assembly Search Path
-      run: export DOTNET_ADDITIONAL_DEPS=Assemblies
+        mkdir -p /home/runner/work/game_path
+        cp .github/Assemblies/* /home/runner/work/game_path/
 
     - name: Build the project
-      run: dotnet build ValleyCast.csproj --configuration Release --no-restore
+      run: |
+        export GamePath=/home/runner/work/game_path
+        dotnet build ValleyCast.csproj --configuration Release --no-restore
 
     - name: Publish build artifacts
       uses: actions/upload-artifact@v3
