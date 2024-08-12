@@ -1,0 +1,8 @@
+C:\Users\johnl\source\repos\ValleyCast\ValleyCast\bin\Debug\net6.0\ValleyCast.deps.json
+C:\Users\johnl\source\repos\ValleyCast\ValleyCast\bin\Debug\net6.0\ValleyCast.dll
+C:\Users\johnl\source\repos\ValleyCast\ValleyCast\obj\Debug\net6.0\ValleyCast.csproj.AssemblyReference.cache
+C:\Users\johnl\source\repos\ValleyCast\ValleyCast\obj\Debug\net6.0\ValleyCast.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\johnl\source\repos\ValleyCast\ValleyCast\obj\Debug\net6.0\ValleyCast.AssemblyInfoInputs.cache
+C:\Users\johnl\source\repos\ValleyCast\ValleyCast\obj\Debug\net6.0\ValleyCast.AssemblyInfo.cs
+C:\Users\johnl\source\repos\ValleyCast\ValleyCast\obj\Debug\net6.0\ValleyCast.csproj.CoreCompileInputs.cache
+C:\Users\johnl\source\repos\ValleyCast\ValleyCast\obj\Debug\net6.0\ValleyCast.dll
