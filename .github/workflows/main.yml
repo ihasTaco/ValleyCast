@@ -35,7 +35,7 @@ jobs:
       run: |
         export GamePath=/home/runner/work/game_path
         export MSBUILDDISABLEREALPATH=1
-        dotnet build ValleyCast.csproj --configuration Release --no-restore
+        dotnet build ValleyCast.csproj --configuration --no-restore
 
     - name: List build output
       run: ls -R build/
