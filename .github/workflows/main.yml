@@ -29,8 +29,7 @@ jobs:
 
     - name: Copy necessary assemblies to dummy game path
       run: |
-        mkdir -p /home/runner/work/game_path
-        cp .github/Assemblies/* /home/runner/work/game_path/
+        cp -r .github/Assemblies/* /home/runner/work/game_path/
 
     - name: Build the project
       run: |
