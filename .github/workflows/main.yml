@@ -22,15 +22,15 @@ jobs:
         dotnet-version: '6.0.x'
 
     - name: Restore dependencies
-      run: dotnet restore ValleyCast/ValleyCast.csproj
+      run: dotnet restore ValleyCast.csproj
 
     - name: Copy necessary assemblies
       run: |
         mkdir -p ModProject/Assemblies
-        cp .github/Assemblies/* ModProject/Assemblies/
+        cp .github/Assemblies/* Assemblies/
 
     - name: Build the project
-      run: dotnet build ValleyCast/ValleyCast.csproj --configuration Release --no-restore
+      run: dotnet build ValleyCast.csproj --configuration Release --no-restore
 
     - name: Publish build artifacts
       uses: actions/upload-artifact@v3
