@@ -1,0 +1,45 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '6.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore ValleyCast.csproj
+
+    - name: Set up dummy game path
+      run: mkdir -p /home/runner/work/game_path
+
+    - name: Copy necessary assemblies to dummy game path
+      run: |
+        mkdir -p /home/runner/work/game_path
+        cp .github/Assemblies/* /home/runner/work/game_path/
+
+    - name: Build the project
+      run: |
+        export GamePath=/home/runner/work/game_path
+        dotnet build ValleyCast.csproj --configuration Release --no-restore
+
+    - name: Publish build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ModBuild
+        path: |
+          ModProject/bin/Release/net6.0/
