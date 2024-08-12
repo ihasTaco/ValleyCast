@@ -41,6 +41,19 @@ jobs:
         export MSBUILDDISABLEREALPATH=1
         dotnet build ValleyCast.csproj --configuration Release --no-restore
 
+    - name: Create release directory
+      run: mkdir -p release
+
+    - name: Move build artifacts to release directory
+      run: |
+        mv ValleyCast/bin/Release/net6.0/ValleyCast.dll ./release/
+        cp manifest.json ./release/
+
+    - name: Zip release files
+      run: |
+        cd release
+        zip -r ../ValleyCast.zip .
+
     - name: Determine next version
       id: get-version
       run: |
@@ -75,9 +88,7 @@ jobs:
     - name: Create GitHub Release and Upload Assets
       uses: softprops/action-gh-release@v1
       with:
-        files: |
-          ./build/ValleyCast.dll
-          ./build/manifest.json
+        files: ./ValleyCast.zip
         tag_name: ${{ env.NEW_TAG }}
         name: "Release ${{ env.NEW_TAG }}"
         body: "Automatic release of version ${{ env.NEW_TAG }}."
