@@ -38,19 +38,21 @@ jobs:
     - name: Create release directory
       run: mkdir -p release
 
-    - name: Build the project into the release directory
+    - name: Build the project
       run: |
         export GamePath=/home/runner/work/game_path
         export MSBUILDDISABLEREALPATH=1
-        dotnet build ValleyCast.csproj --configuration Release --output ./build --no-restore
+        dotnet build ValleyCast.csproj --configuration Release --no-restore
 
-    - name: Copy manifest.json to release directory
-      run: cp manifest.json ./build/
-
-    - name: Zip build files
+    - name: Move necessary files to release directory
       run: |
-        cd build
-        zip -r ../ValleyCast.zip .
+        mv ValleyCast/bin/Release/net6.0/ValleyCast.dll ./release/
+        cp manifest.json ./release/
+
+    - name: Zip release files
+      run: |
+        cd release
+        zip -r ../ValleyCast.zip ValleyCast.dll manifest.json
 
     - name: Determine next version
       id: get-version
