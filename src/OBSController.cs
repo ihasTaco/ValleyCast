@@ -1,8 +1,11 @@
 ﻿using WebSocketSharp;
-using StardewModdingAPI;
 using Newtonsoft.Json.Linq;
 using System.Security.Cryptography;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System.Text;
+using StardewValley;
+using StardewModdingAPI;
 
 namespace ValleyCast
 {
@@ -26,7 +29,8 @@ namespace ValleyCast
 
         private void ConnectToWebSocket()
         {
-            ws = new WebSocket(this.websocketUrl, "obswebsocket.json"); // Specify the protocol here
+            ws = new WebSocket(this.websocketUrl, "obswebsocket.json");
+            PlayerNotify playerNotify = new(this.Monitor);
 
             ws.OnMessage += (sender, e) =>
             {
@@ -40,6 +44,8 @@ namespace ValleyCast
                         break;
                     case 2: // Identified
                         Monitor.Log("OBS WebSocket successfully identified.", StardewModdingAPI.LogLevel.Info);
+                        Texture2D texture = ModEntry.Helper.ModContent.Load<Texture2D>("assets/OBS-Connect.png");
+                        playerNotify.ShowStatusPopup("OBS is connected!", 5);
                         break;
                     default:
                         Monitor.Log($"Received unexpected OpCode: {opCode}", StardewModdingAPI.LogLevel.Warn);
@@ -55,6 +61,7 @@ namespace ValleyCast
             ws.OnClose += (sender, e) =>
             {
                 Monitor.Log("OBS WebSocket connection closed.", StardewModdingAPI.LogLevel.Warn);
+                playerNotify.ShowStatusPopup("OBS disconnected!", 3);
             };
 
             ws.Connect();
@@ -68,15 +75,15 @@ namespace ValleyCast
             string authChallenge = helloData["authentication"]?["challenge"]?.Value<string>()!;
             string salt = helloData["authentication"]?["salt"]?.Value<string>()!;
 
-            JObject identifyRequest = new JObject
-            {
+            #pragma warning disable IDE0090 // Disable 'new' expression can be simplified warning
+            JObject identifyRequest = new JObject {
                 { "op", 1 }, // OpCode 1 for Identify
-                { "d", new JObject
-                    {
+                { "d", new JObject {
                         { "rpcVersion", rpcVersion }
                     }
                 }
             };
+            #pragma warning restore IDE0090 // Re-enable the warning
 
             if (!string.IsNullOrEmpty(authChallenge) && !string.IsNullOrEmpty(salt))
             {
@@ -117,7 +124,6 @@ namespace ValleyCast
 
             string authResponse = Convert.ToBase64String(sha256HashBytes);
 
-            // This authResponse is what you'll send back to OBS in the Identify message
             return authResponse;
         }
 
@@ -150,7 +156,6 @@ namespace ValleyCast
             };
             ws.Send(stopRecordingRequest.ToString());
         }
-
         public void CheckRecordingStatus()
         {
             var checkRecordingStatusRequest = new JObject
