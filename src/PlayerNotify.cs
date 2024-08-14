@@ -7,14 +7,18 @@ using StardewValley;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 
-namespace ValleyCast
-{
-    public class PlayerNotify
-    {
+namespace ValleyCast {
+    public class PlayerNotify {
+        private readonly IMonitor Monitor = null!;
         private string statusMessage = null!;
         private Texture2D statusImage = null!;
         private int statusTimeLeft;
         private bool showStatusPopup;
+
+        public PlayerNotify(IMonitor monitor) {
+            this.Monitor = monitor;
+        }
+
         /// <summary>
         /// Displays a notification message with optional responses and a callback function.
         /// <para>This method is used to prompt the player with a message and handle their response.</para>
@@ -56,55 +60,24 @@ namespace ValleyCast
                 callback?.Invoke(answer);
             });
         }
-        
+
         /// <summary>
         /// Displays a status popup with an image or a message in the bottom-right corner of the screen.
         /// </summary>
         /// <param name="message">The status message to display.</param>
         /// <param name="image">The image to display (e.g., OBS logo with a check or X).</param>
         /// <param name="duration">The duration in ticks for which the popup should be visible (60 ticks = 1 second).</param>
-        public void ShowStatusPopup(string? message, Texture2D? image, int duration)
-        {
-            statusMessage = message!;
-            statusImage = image!;
-            statusTimeLeft = duration;
-            showStatusPopup = true;
+        /// <example>
+        /// <code>
+        /// Texture2D texture = Helper.Content.Load<Texture2D>("assets/obs_logo.png");
+        /// PlayerNotify.ShowStatusPopup("OBS Connected", texture, 180); // Show the popup for 3 seconds
+        /// </code>
+        /// </example>
+        public void ShowStatusPopup(string message, int type) {
+            statusMessage = message ?? string.Empty;
 
-            // Hook into the SMAPI rendering event
-            Helper.Events.Display.RenderedHud += OnRenderedHud;
-            Helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
-        }
-
-        private void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
-        {
-            if (showStatusPopup)
-            {
-                statusTimeLeft--;
-
-                if (statusTimeLeft <= 0)
-                {
-                    showStatusPopup = false;
-
-                    // Unhook the events after the popup disappears
-                    Helper.Events.Display.RenderedHud -= OnRenderedHud;
-                    Helper.Events.GameLoop.UpdateTicked -= OnUpdateTicked;
-                }
-            }
-        }
-
-        private void OnRenderedHud(object sender, RenderedHudEventArgs e)
-        {
-            if (showStatusPopup)
-            {
-                SpriteBatch spriteBatch = Game1.spriteBatch;
-                Vector2 position = new Vector2(Game1.graphics.GraphicsDevice.Viewport.Width - 150, Game1.graphics.GraphicsDevice.Viewport.Height - 100); // Bottom-right corner
-
-                // Draw the image
-                spriteBatch.Draw(statusImage, new Rectangle((int)position.X, (int)position.Y, 64, 64), Color.White);
-
-                // Draw the text
-                spriteBatch.DrawString(Game1.dialogueFont, statusMessage, new Vector2(position.X + 70, position.Y + 20), Color.White);
-            }
+            Monitor.Log($"ShowStatusPopup: message {message}", StardewModdingAPI.LogLevel.Info);
+            Game1.addHUDMessage(new HUDMessage(message, type));
         }
     }
 }
