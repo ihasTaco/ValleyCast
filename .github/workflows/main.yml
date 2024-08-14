@@ -46,7 +46,6 @@ jobs:
 
     - name: Move necessary files to release directory
       run: |
-        rm -rf ./build/*
         cp ./build/ValleyCast.dll ./release/
         cp .github/Assemblies/websocket-sharp-core.dll ./release/
         cp manifest.json ./release/
