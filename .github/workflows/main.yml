@@ -41,21 +41,19 @@ jobs:
         export MSBUILDDISABLEREALPATH=1
         dotnet build ValleyCast.csproj --configuration Release --output ./build --no-restore
 
-    - name: List build output
-      run: ls -R ./build
-
     - name: Create release directory
       run: mkdir -p release
 
     - name: Move necessary files to release directory
       run: |
-        mv ./build/ValleyCast.dll ./release/
+        cp ./build/ValleyCast.dll ./release/
+        cp .github/Assemblies/websocket-sharp-core.dll ./release/
         cp manifest.json ./release/
 
     - name: Zip release files
       run: |
         cd release
-        zip -r ../ValleyCast.zip ValleyCast.dll manifest.json
+        zip -r ../ValleyCast.zip ValleyCast.dll manifest.json websocket-sharp-core.dll
 
     - name: Determine next version
       id: get-version
