@@ -49,13 +49,14 @@ jobs:
 
     - name: Move necessary files to release directory
       run: |
-        mv ./build/ValleyCast.dll ./release/
-        cp manifest.json ./release/
+        mv ./build/ValleyCast.dll ./build/
+        cp .github/Assemblies/websocket-sharp-core.dll ./build/
+        cp manifest.json ./build/
 
     - name: Zip release files
       run: |
         cd release
-        zip -r ../ValleyCast.zip ValleyCast.dll manifest.json
+        zip -r ../ValleyCast.zip ValleyCast.dll manifest.json websocket-sharp-core.dll
 
     - name: Determine next version
       id: get-version
