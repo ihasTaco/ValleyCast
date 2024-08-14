@@ -29,19 +29,21 @@ That's it! (For now, more settings and features will be added soon. See the [Upc
 ## Features
 * **Integrated Mod Settings**: Uses the Generic Mod Configuration Menu for easy setup and customization.
 * **OBS Integration**: Connects Stardew Valley to OBS Studio to control various features.
-  * Currently, it supports starting, stopping, and checking the status of recordings.
+* **Automated Recording Control***: Currently this just starts the recording when you load into a level, but I will be flushing this out soon!
+* **In-Game Notifcations**: The in-game notifications will let you know if the connection between OBS and the mod has been severed and when its connected!
  
 ## Roadmap
 ### Upcoming Features
 * **Improved Error Handling**: Currently, the mod functions best in ideal conditions. Avoid using it during critical streams or recordings until improvements are made.
-* Automated Recording Control: Start/stop recordings based on in-game events such as:
+* **Automated Recording Control**: Start/stop recordings based on in-game events such as:
+  * ~~On World Load**~~
   * Day start/end
   * Week start/end
   * Season changes
-* **In-Game Notifications**: Alerts for connection issues or if OBS closes unexpectedly.
+* ~~**In-Game Notifications**: Alerts for connection issues or if OBS closes unexpectedly.~~
 * **Scene Switching**: Automatically change scenes in OBS, triggered by in-game seasons or events.
 * **Event Notifications**: In-game reminders for important dates such as birthdays, festivals, and order deadlines (configurable in mod settings).
-* Overlay Integration:
+* **Overlay Integration?**:
   * Add a completion sidebar overlay in OBS and possibly in-game (similar to the LoZ Ship of Harkinian tracker).
     * For inspiration, see [this example image](https://i.ytimg.com/vi/M9rPRjzbvWM/maxresdefault.jpg?sqp=-oaymwEmCIAKENAF8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGGMgZSg-MA8=&rs=AOn4CLBU9mEbOiqFz65SIZpgLIq19zimXQ).
   * Implement a keybind to show/hide the overlay
