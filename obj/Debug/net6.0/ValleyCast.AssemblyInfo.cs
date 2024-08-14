@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ValleyCast")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+09458bd9428df408481dd748172ac5b024679b6d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+00b81c265ec373a98b7e288d1559c8195081d403")]
 [assembly: System.Reflection.AssemblyProductAttribute("ValleyCast")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ValleyCast")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
