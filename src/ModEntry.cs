@@ -1,19 +1,19 @@
-﻿using StardewModdingAPI;
+﻿using static System.Net.Mime.MediaTypeNames;
+
+using StardewValley;
+using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using GenericModConfigMenu;
-using ValleyCast;
-using static System.Net.Mime.MediaTypeNames;
-using StardewValley;
 
-namespace ValleyCast
-{
-    public class ModEntry : Mod
-    {
+using ValleyCast;
+using Microsoft.Xna.Framework.Graphics;
+
+namespace ValleyCast {
+    public class ModEntry : Mod {
         private ModConfig Config = null!;
         private OBSController obsController = null!;
 
-        public override void Entry(IModHelper helper)
-        {
+        public override void Entry(IModHelper helper) {
             // Load the config using the new ModConfig class
             this.Config = helper.ReadConfig<ModConfig>();
 
@@ -28,8 +28,7 @@ namespace ValleyCast
             helper.Events.GameLoop.DayStarted += this.OnDayStarted!;
         }
 
-        private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
-        {
+        private void OnGameLaunched(object? sender, GameLaunchedEventArgs e) {
             // get Generic Mod Config Menu's API (if it's installed)
             var configMenu = this.Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
             if (configMenu is null)
@@ -70,58 +69,45 @@ namespace ValleyCast
                 setValue: value => this.Config.Password = value
             );
         }
-        private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
-        {
-            CheckOBSRecordingStatus();
-        }
-
-        private void OnDayStarted(object? sender, DayStartedEventArgs e)
-        {
-            CheckOBSRecordingStatus();
-        }
-
-        private void CheckOBSRecordingStatus()
-        {
+        private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e) {
             // Check if OBS is connected
             this.obsController.CheckRecordingStatus();
 
             // Check if OBS Studio is recording currently
             bool isRecording = this.obsController.IsRecording;
 
-            if (!isRecording)
-            {
-                GameLocation location = Game1.currentLocation;
-                Response[] responses = {
-                    new Response ("1", "Yes"),
-                    new Response ("2", "No")
-                };
-                location.createQuestionDialogue("OBS is not recording, do you want to start recording?", responses, delegate (Farmer _, string answer)
-                {
-                    switch (answer)
-                    {
-                        case "1":
-                            this.obsController.StartRecording();
-                            break;
-                        case "2":
-                            break;
-                    }
-                });
+            CheckRecordingStatus();
+        }
 
-                // Prompt the user if they want to start recording
-                // string response;
-                // Game1.drawObjectDialogue("Message Here");
-                // Response[] responses = {
-                //     new Response ("Yes", (response="Yes")),
-                //     new Response ("No", (response="No"))
-                // };
-                // switch (response)
-                // {
-                //     case "Yes":
-                //         this.obsController.StartRecording();
-                //         break;
-                //     case "No":
-                //         break;
-                // }
+        private void OnDayStarted(object? sender, DayStartedEventArgs e) {
+            CheckRecordingStatus();
+        }
+
+        private void CheckRecordingStatus() {
+            // Check if OBS Studio is recording currently
+            bool isRecording = this.obsController.IsRecording;
+
+            if (!isRecording) {
+                // Send a message to the player
+                PlayerNotify.Notify(
+                    "OBS is not recording, do you want to start recording?",
+                    new List<Response> {
+                        new Response("1", "Yes"),
+                        new Response("2", "No")
+                    },
+                    answer =>
+                    {
+                        if (answer == "1")
+                        {
+                            Console.WriteLine("Recording started.");
+                            this.obsController.StartRecording();
+                        }
+                        else if (answer == "2")
+                        {
+                            Console.WriteLine("Recording not started.");
+                        }
+                    }
+                );
             }
         }
     }

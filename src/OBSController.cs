@@ -3,6 +3,7 @@ using StardewModdingAPI;
 using Newtonsoft.Json.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using StardewValley;
 
 namespace ValleyCast
 {
@@ -55,6 +56,13 @@ namespace ValleyCast
             ws.OnClose += (sender, e) =>
             {
                 Monitor.Log("OBS WebSocket connection closed.", StardewModdingAPI.LogLevel.Warn);
+
+                // Send a message to the player
+                PlayerNotify.Notify(
+                    "The connection to OBS closed unexpectedly!",
+                    new List<Response> {},
+                    answer => {}
+                );
             };
 
             ws.Connect();
@@ -117,7 +125,6 @@ namespace ValleyCast
 
             string authResponse = Convert.ToBase64String(sha256HashBytes);
 
-            // This authResponse is what you'll send back to OBS in the Identify message
             return authResponse;
         }
 
@@ -150,8 +157,46 @@ namespace ValleyCast
             };
             ws.Send(stopRecordingRequest.ToString());
         }
-
         public void CheckRecordingStatus()
+        {
+            var checkRecordingStatusRequest = new JObject
+             {
+                 { "op", 6 }, // OpCode 6 for making a request
+                 { "d", new JObject
+                     {
+                         { "requestType", "GetRecordStatus" },
+                         { "requestId", Guid.NewGuid().ToString() } // Generate a unique request ID
+                     }
+                 }
+             };
+
+            ws.Send(checkRecordingStatusRequest.ToString());
+            Monitor.Log("Sent GetRecordStatus request to OBS WebSocket.", StardewModdingAPI.LogLevel.Info);
+
+            ws.OnMessage += (sender, e) =>
+            {
+                var response = JObject.Parse(e.Data);
+                string requestType = response["d"]?["requestType"]?.ToString()!;
+
+                if (requestType == "GetRecordStatus")
+                {
+                    bool outputActive = response["d"]?["responseData"]?["outputActive"]?.Value<bool>() ?? false;
+
+                    if (outputActive)
+                    {
+                        Monitor.Log("OBS is currently recording.", StardewModdingAPI.LogLevel.Info);
+                        IsRecording = true;
+                    }
+                    else
+                    {
+                        Monitor.Log("OBS is not recording.", StardewModdingAPI.LogLevel.Info);
+                        IsRecording = false;
+                    }
+                }
+            };
+        }
+
+        public void CheckConnectionStatus()
         {
             var checkRecordingStatusRequest = new JObject
              {
