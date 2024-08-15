@@ -1,8 +1,6 @@
 ﻿using WebSocketSharp;
 using Newtonsoft.Json.Linq;
 using System.Security.Cryptography;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using System.Text;
 using StardewValley;
 using StardewValley.Menus;
@@ -24,10 +22,13 @@ namespace ValleyCast
             this.password = password;
             this.Monitor = monitor;
 
-            ConnectToWebSocket();
+            ConnectToWebSocket(1);
         }
 
-        private void ConnectToWebSocket() {
+        private void ConnectToWebSocket(int? attempts = null) {
+            // if maxAttempts isn't set then use the setting, else use the provided amount
+            int maxAttempts = attempts ?? ModEntry.Config.ReconnectAttempts! - 1;
+
             ws = new WebSocket(this.websocketUrl, "obswebsocket.json");
             PlayerNotify playerNotify = new();
 
@@ -36,7 +37,7 @@ namespace ValleyCast
                 int opCode = response["op"]!.Value<int>();
 
                 switch (opCode) {
-                    case 0: // Hello
+                    case 0: // Send the Hello message to start connection process
                         HandleHello(response["d"]!);
                         break;
                     case 2: // Identified
@@ -45,8 +46,8 @@ namespace ValleyCast
                         // When the OBS WebSocket is connected, send a message to the player
                         Game1.activeClickableMenu = new DialogueBox(ModEntry.Config.ConnNotifMessageConnect);
 
-                        // Reset the current reconnect attempts variable
-                        currentReconnectionAttempts = 0;
+                        // Reset the current reconnect attempt variable
+                        currentAttempt = 0;
                         break;
                     default:
                         Monitor.Log($"Received unexpected OpCode: {opCode}", StardewModdingAPI.LogLevel.Warn);
@@ -59,10 +60,9 @@ namespace ValleyCast
             };
 
             ws.OnClose += (sender, e) => {
+                PlayerNotify.ShowStatusPopup($"Trying to reconnect to OBS (Attempt {currentAttempt + 1}/{ModEntry.Config.ReconnectAttempts})", 3);
                 Monitor.Log("OBS WebSocket connection closed.", StardewModdingAPI.LogLevel.Warn);
-                AttemptReconnection();
-                // When the OBS WebSocket connection is closed, send a message to the player
-                //Game1.activeClickableMenu = new DialogueBox(ModEntry.Config.ConnNotifMessageDisconnect);
+                AttemptReconnection(maxAttempts);
             };
 
             ws.Connect();
@@ -177,21 +177,20 @@ namespace ValleyCast
             };
         }
 
-        private int currentReconnectionAttempts = 0;
-        private void AttemptReconnection()
+        private int currentAttempt = 0;
+        private void AttemptReconnection(int maxAttempts)
         {
-            int maxReconnectionAttempts = ModEntry.Config.ReconnectAttempts;
-            if (currentReconnectionAttempts < maxReconnectionAttempts)
+            if (currentAttempt < maxAttempts)
             {
-                Monitor.Log($"Attempting to reconnect to OBS... (Attempt {currentReconnectionAttempts + 1}/{maxReconnectionAttempts})", StardewModdingAPI.LogLevel.Warn);
-                currentReconnectionAttempts++;
+                Monitor.Log($"Attempting to reconnect to OBS... (Attempt {currentAttempt + 1}/{maxAttempts})", StardewModdingAPI.LogLevel.Warn);
+                currentAttempt++;
                 ConnectToWebSocket(); // Attempt to reconnect
             }
             else
             {
-                Monitor.Log($"Failed to reconnect to OBS after {maxReconnectionAttempts} attempts.", StardewModdingAPI.LogLevel.Error);
+                Monitor.Log($"Failed to reconnect to OBS after {maxAttempts} attempts.", StardewModdingAPI.LogLevel.Error);
                 Game1.activeClickableMenu = new DialogueBox(ModEntry.Config.ConnNotifMessageDisconnect);
-                currentReconnectionAttempts = 0;
+                currentAttempt = 0;
             }
         }
     }

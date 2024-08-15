@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-
 using StardewValley;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -56,8 +53,8 @@ namespace ValleyCast {
         /// </summary>
         /// <param name="message">The status message to display.</param>
         /// <param name="type">The type of popup (</param>
-        // public void ShowStatusPopup(string message, int type) {
-        //     Game1.addHUDMessage(new HUDMessage(message, type));
-        // }
+        public static void ShowStatusPopup(string message, int type) {
+            Game1.addHUDMessage(new HUDMessage(message, type));
+        }
     }
 }

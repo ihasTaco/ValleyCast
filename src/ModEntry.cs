@@ -1,7 +1,6 @@
 ﻿using StardewValley;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using GenericModConfigMenu;
 
 namespace ValleyCast {
     public class ModEntry : Mod {
@@ -26,12 +25,16 @@ namespace ValleyCast {
             // Load the config using the new ModConfig class
             Config = Helper.ReadConfig<ModConfig>();
 
+            // Setup mod settings with GenericModConfigMenu
             ModSettings.Settings(ModManifest);
 
-            if (Config.FirstLoad != false) {
+            // Check if this isn't the first time loading the mod
+            if (Config.FirstLoad != true) {
+                // If it isnt the first time loading the mod, then try to connect like normal
                 // Initialize OBSController with the current config values when returning to the title screen
                 OBSController = new OBSController(Config.OBSWebSocketIP, Config.OBSWebSocketPort, Config.Password, this.Monitor);
             } else {
+                // If it is, skip connecting to OBS and set FirstLoad to false
                 Config.FirstLoad = false;
             }
 
@@ -40,12 +43,14 @@ namespace ValleyCast {
 
         private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e) {
             // Check if OBS is connected
+            // TODO: Add a check to see if the user is streaming, if they are then skip this check, or maybe just silence the initial "do you want to record" dialogue
             OBSController!.CheckRecordingStatus();
-
-            CheckRecordingStatus();
         }
 
         private void OnDayStarted(object? sender, DayStartedEventArgs e) {
+            // This will be similar functionality to OnSaveLoaded but wont ask for permission to start recording (if obs is recording)
+            // This function will check the config and see if the user has daily, weekly, or seasonal recording restarts set
+            // if the current day matches the above settings then it will stop recording, and start it back up
             CheckRecordingStatus();
         }
 
