@@ -9,16 +9,6 @@ using StardewModdingAPI.Events;
 
 namespace ValleyCast {
     public class PlayerNotify {
-        private readonly IMonitor Monitor = null!;
-        private string statusMessage = null!;
-        private Texture2D statusImage = null!;
-        private int statusTimeLeft;
-        private bool showStatusPopup;
-
-        public PlayerNotify(IMonitor monitor) {
-            this.Monitor = monitor;
-        }
-
         /// <summary>
         /// Displays a notification message with optional responses and a callback function.
         /// <para>This method is used to prompt the player with a message and handle their response.</para>
@@ -62,22 +52,12 @@ namespace ValleyCast {
         }
 
         /// <summary>
-        /// Displays a status popup with an image or a message in the bottom-right corner of the screen.
+        /// Displays a simple notification in the bottom-left corner of the screen.
         /// </summary>
         /// <param name="message">The status message to display.</param>
-        /// <param name="image">The image to display (e.g., OBS logo with a check or X).</param>
-        /// <param name="duration">The duration in ticks for which the popup should be visible (60 ticks = 1 second).</param>
-        /// <example>
-        /// <code>
-        /// Texture2D texture = Helper.Content.Load<Texture2D>("assets/obs_logo.png");
-        /// PlayerNotify.ShowStatusPopup("OBS Connected", texture, 180); // Show the popup for 3 seconds
-        /// </code>
-        /// </example>
-        public void ShowStatusPopup(string message, int type) {
-            statusMessage = message ?? string.Empty;
-
-            Monitor.Log($"ShowStatusPopup: message {message}", StardewModdingAPI.LogLevel.Info);
-            Game1.addHUDMessage(new HUDMessage(message, type));
-        }
+        /// <param name="type">The type of popup (</param>
+        // public void ShowStatusPopup(string message, int type) {
+        //     Game1.addHUDMessage(new HUDMessage(message, type));
+        // }
     }
 }
