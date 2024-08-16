@@ -21,7 +21,6 @@ namespace ValleyCast {
             Helper.Events.GameLoop.GameLaunched += this.OnGameLaunched!;
             Helper.Events.GameLoop.SaveLoaded += this.OnSaveLoaded!;
             Helper.Events.GameLoop.DayStarted += this.OnDayStarted!;
-
         }
 
         private void OnGameLaunched(object? sender, GameLaunchedEventArgs e) {
@@ -37,7 +36,7 @@ namespace ValleyCast {
         }
 
         private static async void OnSaveLoaded(object? sender, SaveLoadedEventArgs e) {
-            (bool isRecording, bool isStreaming) = await CheckOBSStatus();
+            (isRecording, isStreaming) = await CheckOBSStatus();
 
             // TODO: Add a setting in case the user wants to suppress recording notifications while streaming
             if (isStreaming || !isStreaming) {
@@ -57,18 +56,44 @@ namespace ValleyCast {
         }
 
         private static async void OnDayStarted(object? sender, DayStartedEventArgs e) {
-            (bool isRecording, bool isStreaming) = await CheckOBSStatus();
+            (isRecording, isStreaming) = await CheckOBSStatus();
 
             // TODO: Add a setting in case the user wants to suppress recording notifications while streaming
-            if (isStreaming || !isStreaming) {
+            if (true) {
                 if (isRecording) {
-                    ModMonitor.Log("Daily Alert: OBS is recording!", StardewModdingAPI.LogLevel.Alert);
+                    // Here is where we should check the setting for if the user wants daily, weekly or monthly recording toggle
+                    // For now we are just going to say were always going to restart recording daily
+                    if (true) {
+                        RestartRecord();
+                    } else {
+                        // If the user doesnt want daily toggles well need to check the current day and see if its the start of a new week or new month
+                        if ((Game1.dayOfMonth - 1) % 7 == 0)
+                        {
+                            RestartRecord();
+                        }
+                        else if (Game1.dayOfMonth == 1)
+                        {
+                            RestartRecord();
+                        }
+                    }
                 } else {
                     ModMonitor.Log("Daily Alert: OBS isn't recording!", StardewModdingAPI.LogLevel.Alert);
                 }
             } else {
-                if (isRecording) {
-                    ModMonitor.Log("Daily Alert: OBS is recording!", StardewModdingAPI.LogLevel.Alert);
+                if (isRecording)
+                {
+                    // Here is where we should check the setting for if the user wants daily, weekly or monthly recording toggle
+                    // For now we are just going to say were always going to restart recording daily
+                    if (true) {
+                        RestartRecord();
+                    } else {
+                        // If the user doesnt want daily toggles well need to check the current day and see if its the start of a new week or new month
+                        if ((Game1.dayOfMonth - 1) % 7 == 0) {
+                            RestartRecord();
+                        } else if (Game1.dayOfMonth == 1) {
+                            RestartRecord();
+                        }
+                    }
                 } else {
                     ModMonitor.Log("Daily Alert: OBS isn't recording!", StardewModdingAPI.LogLevel.Alert);
                 }
@@ -101,11 +126,11 @@ namespace ValleyCast {
             // If the response outputActive is null then set it false if its available then use the response
             bool isStreaming = response["responseData"]?["outputActive"]?.Value<bool>() ?? false;
 
-            return (isRecording: isRecording, isStreaming: isStreaming);
+            return (isRecording, isStreaming);
 
         }
 
-        private static async Task AskRecord(bool isRecording) {
+        private static async Task AskRecord() {
             if (!isRecording) {
                 PlayerNotify.Dialogue(
                     "Wait! OBS isn't recording! Do you want to start?",
@@ -115,29 +140,60 @@ namespace ValleyCast {
                     },
                     answer => {
                         if (answer == "1") {
-                            ModMonitor.Log("Sending Start Record Request.", StardewModdingAPI.LogLevel.Alert);
-                            var requestData = new JObject {
-                                { "requestType", "StartRecord" },
-                                { "requestId", System.Guid.NewGuid().ToString() }
-                            };
-                            var response = await OBSController.HandleOp6Requests(requestData);
-
-                            // If the response outputActive is null then set it false if its available then use the response
-                            isRecording = response["responseData"]?["outputActive"]?.Value<bool>() ?? false;
-
-                            if (isRecording) {
-                                ModMonitor.Log("OBS is now recording!", StardewModdingAPI.LogLevel.Alert);
-                            } else {
-                                ModMonitor.Log($"Uh Oh! OBS is not recording! Comments: {response["responseData"]?["comment"]}", StardewModdingAPI.LogLevel.Alert);
-                            }
-
-                            return isRecording;
+                            StartRecord();
                         } else {
-                            return false;
+                            return;
                         }
                     }
                 );
             }
+        }
+
+        private static async Task StartRecord() {
+            ModMonitor.Log("Sending Start Record Request.", StardewModdingAPI.LogLevel.Alert);
+            var requestData = new JObject {
+                { "requestType", "StartRecord" },
+                { "requestId", System.Guid.NewGuid().ToString() }
+            };
+            var response = await OBSController.HandleOp6Requests(requestData);
+
+            // If the response outputActive is null then set it false if its available then use the response
+            isRecording = response["responseData"]?["outputActive"]?.Value<bool>() ?? false;
+
+            if (isRecording)
+            {
+                ModMonitor.Log("OBS is now recording!", StardewModdingAPI.LogLevel.Alert);
+            }
+            else
+            {
+                ModMonitor.Log($"Uh Oh! OBS is not recording! Comments: {response["responseData"]?["comment"]}", StardewModdingAPI.LogLevel.Alert);
+            }
+        }
+
+        private static async Task StopRecord() {
+            ModMonitor.Log("Sending Stop Record Request.", StardewModdingAPI.LogLevel.Alert);
+            var requestData = new JObject {
+                { "requestType", "StopRecord" },
+                { "requestId", System.Guid.NewGuid().ToString() }
+            };
+            var response = await OBSController.HandleOp6Requests(requestData);
+
+            ModMonitor.Log($"OBS has stopped recording! Output Path: {response["responseData"]?["outputPath"]}", StardewModdingAPI.LogLevel.Alert);
+
+            isRecording = false;
+        }
+
+        private static async Task RestartRecord() {
+            // If the user wants daily recording toggles
+            ModMonitor.Log("Daily Alert: Stopping Recording...", StardewModdingAPI.LogLevel.Alert);
+            StopRecord();
+
+            // Here is where we would set the file name, probably could be "<Farm Name> Day <Day> Year <Year>"
+            // For now though, im not messing with that
+            ModMonitor.Log("Daily Alert: Starting Recording...", StardewModdingAPI.LogLevel.Alert);
+            StartRecord();
+
+            ModMonitor.Log("Daily Alert: Recording has been restarted!", StardewModdingAPI.LogLevel.Alert);
         }
     }
 }
