@@ -25,7 +25,7 @@ namespace ValleyCast
             ConnectToWebSocket(1);
         }
 
-        private void ConnectToWebSocket(int? attempts = null) {
+        public void ConnectToWebSocket(int? attempts = null) {
             // if maxAttempts isn't set then use the setting, else use the provided amount
             int maxAttempts = attempts ?? ModEntry.Config.ReconnectAttempts! - 1;
 
@@ -184,7 +184,7 @@ namespace ValleyCast
             {
                 Monitor.Log($"Attempting to reconnect to OBS... (Attempt {currentAttempt + 1}/{maxAttempts})", StardewModdingAPI.LogLevel.Warn);
                 currentAttempt++;
-                ConnectToWebSocket(); // Attempt to reconnect
+                ConnectToWebSocket(maxAttempts); // Attempt to reconnect
             }
             else
             {
