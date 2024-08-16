@@ -324,7 +324,7 @@ namespace ValleyCast {
             }
         }
 
-        public async Task<JToken> HandleRequests(JToken data) {
+        public async Task<JToken> HandleOp6Requests(JToken data) {
             tcs = new TaskCompletionSource<JToken>();
 
             var request = new JObject {
