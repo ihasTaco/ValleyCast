@@ -4,7 +4,7 @@ ValleyCast is a utility mod that automatically controls OBS Studio based on in-g
 ## Compatibility
 **Do not use this mod yet, unless for testing and non-critical streams or recordings!** Currently it works™, but there isnt much error handling, and may cause issues during a stream or recording
 * Tested with OBS Studio v30.2.2
-  * I have no idea if this will work out of the gat with Streamlabs OBS yet, will need more testing
+  * I have no idea if this will work out of the gate with Streamlabs OBS yet, will need more testing
 
 ## Getting Started
 ### Dependencies
