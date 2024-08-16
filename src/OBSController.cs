@@ -11,7 +11,7 @@ namespace ValleyCast
     {
         private readonly string websocketUrl;
         private readonly string password;
-        private WebSocket ws = null!;
+        public WebSocket ws = null!;
 
         public bool IsRecording { get; private set; } = false;
 

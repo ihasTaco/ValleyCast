@@ -9,6 +9,7 @@ namespace ValleyCast {
             var configMenu = ModEntry.Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
             if (configMenu is null)
                 return;
+            string currentPassword = ModEntry.Config.Password;
 
             // register mod
             configMenu.Register(
@@ -40,8 +41,15 @@ namespace ValleyCast {
             configMenu.AddTextOption(
                 mod: ModManifest,
                 name: () => "OBS WebSocket Password",
-                getValue: () => ModEntry.Config.Password,
-                setValue: value => ModEntry.Config.Password = value
+                getValue: () => new string('*', ModEntry.Config.Password.Length),
+                setValue: value => {
+                    // Update the actual password only if the user enters a value different from asterisks
+                    if (value != new string('*', currentPassword.Length) && !string.IsNullOrEmpty(value))
+                    {
+                        ModEntry.Config.Password = value;
+                        currentPassword = value; // Update the currentPassword reference
+                    }
+                }
             );
 
             // Add the reconnect button only if the player is in a game

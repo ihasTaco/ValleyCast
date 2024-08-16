@@ -1,6 +1,8 @@
 ﻿using StardewValley;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
+using Newtonsoft.Json.Linq;
+using WebSocketSharp;
 
 namespace ValleyCast {
     public class ModEntry : Mod {
@@ -56,35 +58,69 @@ namespace ValleyCast {
             OBSController!.CheckRecordingStatus();
         }
 
-        private void OnDayStarted(object? sender, DayStartedEventArgs e) {
+        async private void OnDayStarted(object? sender, DayStartedEventArgs e) {
             // This will be similar functionality to OnSaveLoaded but wont ask for permission to start recording (if obs is recording)
             // This function will check the config and see if the user has daily, weekly, or seasonal recording restarts set
             // if the current day matches the above settings then it will stop recording, and start it back up
-            CheckRecordingStatus();
+            await CheckRecordingStatus();
         }
+        private static async Task CheckRecordingStatus()
+        {
+            // Create a TaskCompletionSource to wait for the op: 7 response
+            var tcs = new TaskCompletionSource<bool>();
 
-        private static void CheckRecordingStatus() {
-            // Check if OBS Studio is recording currently
-            bool isRecording = OBSController!.IsRecording;
+            // Define a temporary event handler to capture the response
+            void OnMessageReceived(object? sender, MessageEventArgs e)
+            {
+                var response = JObject.Parse(e.Data);
+                int opCode = response["op"]?.Value<int>() ?? -1;
 
-            if (!isRecording) {
+                if (opCode == 7)
+                {
+                    // Ensure we are handling the specific response for GetRecordStatus
+                    string requestType = response["d"]!["requestType"]!.ToString();
+                    if (requestType == "GetRecordStatus")
+                    {
+                        bool outputActive = response["d"]?["responseData"]?["outputActive"]?.Value<bool>() ?? false;
+
+                        // Set the result in the TaskCompletionSource
+                        tcs.SetResult(outputActive);
+
+                        // Unsubscribe from the event
+                        OBSController!.ws.OnMessage -= OnMessageReceived;
+                    }
+                }
+            }
+
+            // Subscribe to the WebSocket OnMessage event
+            OBSController!.ws.OnMessage += OnMessageReceived;
+
+            // Send the request to OBS
+            OBSController.CheckRecordingStatus();
+
+            // Await the result
+            bool isRecording = await tcs.Task;
+
+            // Now that we know whether OBS is recording, proceed with the logic
+            if (!isRecording)
+            {
                 // Send a message to the player
                 PlayerNotify.Notify(
                     "OBS is not recording, do you want to start recording?",
                     new List<Response> {
-                        new ("1", "Yes. Lights. Camera. Action!"),
-                        new ("2", "Nah, not feeling it right now")
+                new ("1", "Yes. Lights. Camera. Action!"),
+                new ("2", "Nah, not feeling it right now")
                     },
                     answer =>
                     {
                         if (answer == "1")
                         {
-                            ModMonitor.Log("Recording started.", LogLevel.Alert);
+                            ModMonitor.Log("Recording started.", StardewModdingAPI.LogLevel.Alert);
                             OBSController.StartRecording();
                         }
                         else if (answer == "2")
                         {
-                            ModMonitor.Log("Recording not started.", LogLevel.Alert);
+                            ModMonitor.Log("Recording not started.", StardewModdingAPI.LogLevel.Alert);
                         }
                     }
                 );
