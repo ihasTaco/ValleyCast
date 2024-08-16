@@ -7,8 +7,7 @@ namespace ValleyCast {
     public class ModSettings {
         public static void Settings(IManifest ModManifest) {
             var configMenu = ModEntry.Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
-            if (configMenu is null)
-                return;
+            if (configMenu is null) {  return; }
             string currentPassword = ModEntry.Config.Password;
 
             // register mod
@@ -56,19 +55,21 @@ namespace ValleyCast {
             configMenu.AddComplexOption(
                 mod: ModManifest,
                 name: () => "Connect to OBS",
-                draw: (spriteBatch, position) => {
+                draw: async (spriteBatch, position) => {
                     if (Game1.hasLoadedGame)
                     {
                         var buttonBounds = new Rectangle((int)position.X, (int)position.Y, 150, 40);
                         spriteBatch.Draw(Game1.mouseCursors, buttonBounds, new Rectangle(128, 256, 64, 64), Color.White);
-                        Utility.drawTextWithShadow(spriteBatch, "Reconnect", Game1.dialogueFont, new Vector2(position.X + 20, position.Y + 10), Color.Black);
+                        Utility.drawTextWithShadow(spriteBatch, "", Game1.dialogueFont, new Vector2(position.X + 20, position.Y + 10), Color.Black);
 
                         if (Game1.input.GetMouseState().LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed &&
                             buttonBounds.Contains(Game1.getMouseX(), Game1.getMouseY()))
                         {
                             try
                             {
-                                ModEntry.OBSController.ConnectToWebSocket(1);
+                                if (!ModEntry.IsConnected) {
+                                    await ModEntry.OBSController.Connect();
+                                }
                             }
                             catch (Exception ex)
                             {
