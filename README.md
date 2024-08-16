@@ -29,17 +29,21 @@ That's it! (For now, more settings and features will be added soon. See the [Upc
 ## Features
 * **Integrated Mod Settings**: Uses the Generic Mod Configuration Menu for easy setup and customization.
 * **OBS Integration**: Connects Stardew Valley to OBS Studio to control various features.
-* **Automated Recording Control***: Currently this just starts the recording when you load into a level, but I will be flushing this out soon!
 * **In-Game Notifcations**: The in-game notifications will let you know if the connection between OBS and the mod has been severed and when its connected!
+* **Improved Error Handling**
+* **Save Loaded Recording Check and Toggle**
+* **Day End Recording Toggle**
+* Now includes cleaner code, and laid the ground work for the rest of the upcoming features. This is including all the event and request handler functions
+* All of the logs!!!
  
 ## Roadmap
 ### Upcoming Features
-* **Improved Error Handling**: Currently, the mod functions best in ideal conditions. Avoid using it during critical streams or recordings until improvements are made.
+* ~~**Improved Error Handling**: Currently, the mod functions best in ideal conditions. Avoid using it during critical streams or recordings until improvements are made.~~
 * **Automated Recording Control**: Start/stop recordings based on in-game events such as:
   * ~~On World Load**~~
-  * Day start/end
-  * Week start/end
-  * Season changes
+  * ~~Day End Recording Toggle~~
+  * Week End Recording Toggle (Setup just need the settings)
+  * Monthly End Recording Toggle (Setup just need the settings)
 * ~~**In-Game Notifications**: Alerts for connection issues or if OBS closes unexpectedly.~~
 * **Scene Switching**: Automatically change scenes in OBS, triggered by in-game seasons or events.
 * **Event Notifications**: In-game reminders for important dates such as birthdays, festivals, and order deadlines (configurable in mod settings).
