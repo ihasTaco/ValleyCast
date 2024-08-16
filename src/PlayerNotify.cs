@@ -29,7 +29,7 @@ namespace ValleyCast {
         /// );
         /// </code>
         /// </example>
-        public static void Notify(string message, List<Response>? responses, Action<string>? callback)
+        public static void Dialogue(string message, List<Response>? responses, Action<string>? callback)
         {
             // Get the player's current location
             GameLocation location = Game1.currentLocation;
@@ -49,7 +49,7 @@ namespace ValleyCast {
         /// </summary>
         /// <param name="message">The status message to display.</param>
         /// <param name="type">The type of popup (</param>
-        public static void ShowStatusPopup(string message, int type) {
+        public static void Popup(string message, int type) {
             Game1.addHUDMessage(new HUDMessage(message, type));
         }
     }
