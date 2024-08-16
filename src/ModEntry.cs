@@ -22,9 +22,6 @@ namespace ValleyCast {
             Helper.Events.GameLoop.SaveLoaded += this.OnSaveLoaded!;
             Helper.Events.GameLoop.DayStarted += this.OnDayStarted!;
 
-            // Register event for when the player returns to the title screen
-            Helper.Events.GameLoop.ReturnedToTitle += this.OnReturnedToTitle!;
-
         }
 
         private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
@@ -46,10 +43,6 @@ namespace ValleyCast {
             }
 
 
-        }
-        private void OnReturnedToTitle(object? sender, ReturnedToTitleEventArgs e)
-        {
-            return;
         }
 
         private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e) {
