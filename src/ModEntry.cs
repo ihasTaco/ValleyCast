@@ -47,18 +47,14 @@ namespace ValleyCast {
 
 
         }
-        private void OnReturnedToTitle(object? sender, ReturnedToTitleEventArgs e)
-        {
-            return;
-        }
 
-        private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e) {
+        private static void OnSaveLoaded(object? sender, SaveLoadedEventArgs e) {
             // Check if OBS is connected
             // TODO: Add a check to see if the user is streaming, if they are then skip this check, or maybe just silence the initial "do you want to record" dialogue
             OBSController!.CheckRecordingStatus();
         }
 
-        async private void OnDayStarted(object? sender, DayStartedEventArgs e) {
+        async private static void OnDayStarted(object? sender, DayStartedEventArgs e) {
             // This will be similar functionality to OnSaveLoaded but wont ask for permission to start recording (if obs is recording)
             // This function will check the config and see if the user has daily, weekly, or seasonal recording restarts set
             // if the current day matches the above settings then it will stop recording, and start it back up
