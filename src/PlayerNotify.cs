@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using StardewValley;
-using StardewModdingAPI;
-using StardewModdingAPI.Events;
+﻿using StardewValley;
 
 namespace ValleyCast {
     public class PlayerNotify {

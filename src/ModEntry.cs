@@ -7,16 +7,21 @@ namespace ValleyCast {
         public static ModConfig Config { get; set; } = null!;
         public static OBSController OBSController { get; private set; } = null!;
         public new static IModHelper Helper { get; private set; } = null!;
+        public static IMonitor ModMonitor { get; private set; } = null!;
 
         public override void Entry(IModHelper helper)
         {
             Helper = helper;
+            ModMonitor = this.Monitor;
             // Register the GameLaunched event
             Helper.Events.GameLoop.GameLaunched += this.OnGameLaunched!;
 
             // Register events for loading a save or starting a new game
             Helper.Events.GameLoop.SaveLoaded += this.OnSaveLoaded!;
             Helper.Events.GameLoop.DayStarted += this.OnDayStarted!;
+
+            // Register event for when the player returns to the title screen
+            Helper.Events.GameLoop.ReturnedToTitle += this.OnReturnedToTitle!;
 
         }
 
@@ -32,13 +37,17 @@ namespace ValleyCast {
             if (Config.FirstLoad != true) {
                 // If it isnt the first time loading the mod, then try to connect like normal
                 // Initialize OBSController with the current config values when returning to the title screen
-                OBSController = new OBSController(Config.OBSWebSocketIP, Config.OBSWebSocketPort, Config.Password, this.Monitor);
+                OBSController = new OBSController(Config.OBSWebSocketIP, Config.OBSWebSocketPort, Config.Password);
             } else {
                 // If it is, skip connecting to OBS and set FirstLoad to false
                 Config.FirstLoad = false;
             }
 
 
+        }
+        private void OnReturnedToTitle(object? sender, ReturnedToTitleEventArgs e)
+        {
+            return;
         }
 
         private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e) {
@@ -70,12 +79,12 @@ namespace ValleyCast {
                     {
                         if (answer == "1")
                         {
-                            Console.WriteLine("Recording started.");
+                            ModMonitor.Log("Recording started.", LogLevel.Alert);
                             OBSController.StartRecording();
                         }
                         else if (answer == "2")
                         {
-                            Console.WriteLine("Recording not started.");
+                            ModMonitor.Log("Recording not started.", LogLevel.Alert);
                         }
                     }
                 );
