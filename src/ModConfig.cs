@@ -12,5 +12,8 @@ namespace ValleyCast
         public bool EnableConnNotif { get; set; } = true;
         public string ConnNotifMessageDisconnect { get; set; } = "Whoops, OBS got disconnected! Check if it's started.";
         public string ConnNotifMessageConnect { get; set; } = "OBS is connected, and ready to go!";
+        public string DayCounterSource { get; set; } = "DayText";
+        public string DayCounterFormat { get; set; } = "Day {day}, {season}, Year {year}";
+        public bool ReloadTrigger { get; set; } = false;
     }
 }

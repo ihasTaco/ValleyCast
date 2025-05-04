@@ -18,6 +18,9 @@ namespace ValleyCast {
             Helper = helper;
             ModMonitor = Monitor;
 
+            // Key bindings
+            Helper.Events.Input.ButtonPressed += OnButtonPressed!; // Test Config Hot Reload Keybind
+
             // Register events
             Helper.Events.GameLoop.GameLaunched += this.OnGameLaunched!;
             Helper.Events.GameLoop.SaveLoaded += this.OnSaveLoaded!;
@@ -94,6 +97,14 @@ namespace ValleyCast {
                 } else {
                     ModMonitor.Log("OBS isn't recording!", StardewModdingAPI.LogLevel.Alert);
                 }
+
+                // Update the day counter text
+                string formattedText = Config.DayCounterFormat
+                    .Replace("{day}", Game1.dayOfMonth.ToString())
+                    .Replace("{season}", Game1.currentSeason)
+                    .Replace("{year}", Game1.year.ToString());
+
+                await OBSController.UpdateDayText(Config.DayCounterSource, formattedText);
             } else {
                 if (IsRecording) {
                     // I would like to create recording chapters via CreateRecordChapter here
@@ -144,7 +155,6 @@ namespace ValleyCast {
             // If the response outputActive is null then set it false if its available then use the response
             IsStreaming = response["responseData"]?["outputActive"]?.Value<bool>() ?? false;
 
-            // This ensures the method is always asynchronous
             await Task.CompletedTask;
         }
 
@@ -164,7 +174,6 @@ namespace ValleyCast {
                 );
             }
 
-            // This ensures the method is always asynchronous
             await Task.CompletedTask;
         }
 
@@ -261,6 +270,35 @@ namespace ValleyCast {
 
             // This ensures the method is always asynchronous
             await Task.CompletedTask;
+        }
+
+        // Hot reload the config
+        public static void ReloadConfig() {
+            ModMonitor.Log("Reloading config from file...", StardewModdingAPI.LogLevel.Debug);
+            Config = Helper.ReadConfig<ModConfig>();
+            ModMonitor.Log("Config reloaded!", StardewModdingAPI.LogLevel.Info);
+
+            // Immediately update the OBS text after reloading
+            if (IsConnected)
+            {
+                string formattedText = Config.DayCounterFormat
+                    .Replace("{day}", Game1.dayOfMonth.ToString())
+                    .Replace("{season}", Game1.currentSeason)
+                    .Replace("{year}", Game1.year.ToString());
+
+                _ = OBSController.UpdateDayText(Config.DayCounterSource, formattedText);
+            }
+        }
+
+        private void OnButtonPressed(object? sender, ButtonPressedEventArgs e) {
+            // Only trigger on a specific key and only if player is loaded in
+            if (!Context.IsWorldReady) return;
+
+            if (e.Button == SButton.F5)
+            {
+                ReloadConfig();
+                Game1.addHUDMessage(new HUDMessage("Config reloaded!", HUDMessage.newQuest_type));
+            }
         }
     }
 }

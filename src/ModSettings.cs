@@ -108,6 +108,25 @@ namespace ValleyCast {
                 getValue: () => ModEntry.Config.ConnNotifMessageDisconnect,
                 setValue: value => ModEntry.Config.ConnNotifMessageDisconnect = value
             );
+
+            configMenu.AddSectionTitle(
+                mod: ModManifest,
+                text: () => "Advanced"
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => "Reload Config",
+                tooltip: () => "Check this to reload the config.json file mid-game.",
+                getValue: () => false, // Always shows unchecked
+                setValue: value => {
+                    if (value)
+                    {
+                        ModEntry.ReloadConfig();
+                        Game1.addHUDMessage(new HUDMessage("Config reloaded from menu!", HUDMessage.newQuest_type));
+                    }
+                }
+            );
         }
     }
 }

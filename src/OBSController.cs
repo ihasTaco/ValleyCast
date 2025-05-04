@@ -346,5 +346,25 @@ namespace ValleyCast {
 
             return await tcs.Task;
         }
+
+        public async Task UpdateDayText(string sourceName, string text) {
+            var requestData = new JObject {
+                { "requestType", "SetInputSettings" },
+                { "requestId", Guid.NewGuid().ToString() },
+                { "requestData", new JObject
+                    {
+                        { "inputName", sourceName },
+                        { "inputSettings", new JObject
+                            {
+                                { "text", text }
+                            }
+                        }
+                    }
+                }
+            };
+
+            ModEntry.ModMonitor.Log($"Sending OBS text update: '{text}' to source '{sourceName}'", StardewModdingAPI.LogLevel.Debug);
+            await HandleOp6Requests(requestData);
+        }
     }
 }
