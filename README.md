@@ -1,7 +1,7 @@
 # ValleyCast
 
 ValleyCast is a utility mod that automatically controls OBS Studio based on in-game events in Stardew Valley.  
-Supports dynamic overlays, text updates, recording triggers, and more—with full config control.
+Supports dynamic overlays, text updates, recording triggers, and more, with full config control.
 
 🎥 Available on NexusMods: [ValleyCast on Nexus](https://www.nexusmods.com/stardewvalley/mods/26947)
 
@@ -96,4 +96,4 @@ Supports dynamic overlays, text updates, recording triggers, and more—with ful
 
 ## ❤️ Developer Note
 
-I'm currently trying out some new techniques for managing ADHD and avoiding burnout. That means updates may be paced out more intentionally. Expect the next one in about a week—thanks for your patience and support!
+I'm currently trying out some new techniques for managing ADHD and avoiding burnout. That means updates may be paced out more intentionally. Expect the next one in about a week, thanks for your patience and support!
