@@ -1,54 +1,99 @@
 # ValleyCast
-ValleyCast is a utility mod that automatically controls OBS Studio based on in-game events in Stardew Valley.
+
+ValleyCast is a utility mod that automatically controls OBS Studio based on in-game events in Stardew Valley.  
+Supports dynamic overlays, text updates, recording triggers, and more—with full config control.
+
+🎥 Available on NexusMods: [ValleyCast on Nexus](https://www.nexusmods.com/stardewvalley/mods/26947)
+
+---
 
 ## Compatibility
-**Do not use this mod yet, unless for testing and non-critical streams or recordings!** Currently it works™, but there isnt much error handling, and may cause issues during a stream or recording
-* Tested with OBS Studio v30.2.2
-  * I have no idea if this will work out of the gate with Streamlabs OBS yet, will need more testing
+
+- ✅ Tested with **OBS Studio v31.0.3**
+- ✅ Tested with **Stardew Valley 1.6.15**
+- 🧪 Not yet tested with Streamlabs OBS
+- 🪟 Windows only for now (May work with *unix & mac devices but haven't tested yet)
+
+---
 
 ## Getting Started
-### Dependencies
-* [SMAPI](https://smapi.io/)
-* [Generic Mod Configuration Menu](https://www.nexusmods.com/stardewvalley/mods/5098)
 
-### Installation and Setup
-1. Configure OBS Studio:
-   * Open OBS Studio.
-   * Navigate to Tools > WebSocket Server Settings.
-   * Click on Show Connection Info and set this window aside.
-2. Launch Stardew Valley:
-   * Ensure that [SMAPI](https://smapi.io/) and [Generic Mod Configuration Menu](https://www.nexusmods.com/stardewvalley/mods/5098) are installed.
-   * Start Stardew Valley.
-3. Set Up ValleyCast:
-   * Once in the game, click the cog icon in the bottom left corner of the screen.
-   * Select ValleyCast from the menu.
-   * Enter the OBS connection details (IP and Port) from the WebSocket Server Settings window.
-     * **Note**: For users recording and playing on the same device, the default IP and Port should work fine. If you're using a different device, input the OBS IP and Port information.
-That's it! (For now, more settings and features will be added soon. See the [Upcoming Features](#Upcoming-Features) section below.)
+### 🔗 Dependencies
 
-## Features
-* **Integrated Mod Settings**: Uses the Generic Mod Configuration Menu for easy setup and customization.
-* **OBS Integration**: Connects Stardew Valley to OBS Studio to control various features.
-* **In-Game Notifcations**: The in-game notifications will let you know if the connection between OBS and the mod has been severed and when its connected!
-* **Improved Error Handling**
-* **Save Loaded Recording Check and Toggle**
-* **Day End Recording Toggle**
-* Now includes cleaner code, and laid the ground work for the rest of the upcoming features. This is including all the event and request handler functions
-* All of the logs!!!
- 
-## Roadmap
+- [SMAPI](https://smapi.io/)
+- [Generic Mod Configuration Menu (GMCM)](https://www.nexusmods.com/stardewvalley/mods/5098)
+
+### 🛠️ Installation & Setup
+
+1. **Configure OBS Studio**
+   - Open OBS Studio
+   - Go to `Tools > WebSocket Server Settings`
+   - Click **Show Connection Info** and keep it open
+
+2. **Launch Stardew Valley**
+   - Start the game using SMAPI
+   - Make sure GMCM is installed
+
+3. **Configure ValleyCast In-Game**
+   - Click the ⚙️ cog icon in the bottom-left of the screen
+   - Select **ValleyCast**
+   - Enter the OBS connection info (IP and Port)
+     - Default values work if OBS is running on the same device
+
+---
+
+## ✅ Features (v0.1.6)
+
+- **NEW! | 🔄 Hot Reload Config**  
+  Reload your `config.json` in-game via F5 or a config menu toggle
+
+- **NEW! | 📝 OBS Text Source Updates**  
+  Automatically updates OBS text sources with in-game info like day, season, year (fully customizable)
+
+- **🎛 Integrated Mod Settings**  
+  Uses GMCM to manage all mod config in-game
+
+- **🎥 OBS Recording Control**  
+  Start/stop recordings based on events like save load or day-end
+
+- **🔔 In-Game Notifications**  
+  Get alerts when OBS connects, disconnects, or config is reloaded
+
+- **🪵 Robust Logging**  
+  Logs all OBS communication and mod activity to SMAPI console
+
+---
+
+## 🐞 Known Issues
+
+- OBS `IsRecording` check is unreliable in OBS 30+ and may not reflect the true recording state
+- Scene switching + weekly/monthly event triggers exist but aren't exposed in the UI yet
+- Not tested on macOS or Streamlabs OBS
+
+---
+
+## 🚧 Roadmap
+
 ### Upcoming Features
-* ~~**Improved Error Handling**: Currently, the mod functions best in ideal conditions. Avoid using it during critical streams or recordings until improvements are made.~~
-* **Automated Recording Control**: Start/stop recordings based on in-game events such as:
-  * ~~On World Load**~~
-  * ~~Day End Recording Toggle~~
-  * Week End Recording Toggle (Setup just need the settings)
-  * Monthly End Recording Toggle (Setup just need the settings)
-* ~~**In-Game Notifications**: Alerts for connection issues or if OBS closes unexpectedly.~~
-* **Scene Switching**: Automatically change scenes in OBS, triggered by in-game seasons or events.
-* **Event Notifications**: In-game reminders for important dates such as birthdays, festivals, and order deadlines (configurable in mod settings).
-* **Overlay Integration?**:
-  * Add a completion sidebar overlay in OBS and possibly in-game (similar to the LoZ Ship of Harkinian tracker).
-    * For inspiration, see [this example image](https://i.ytimg.com/vi/M9rPRjzbvWM/maxresdefault.jpg?sqp=-oaymwEmCIAKENAF8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGGMgZSg-MA8=&rs=AOn4CLBU9mEbOiqFz65SIZpgLIq19zimXQ).
-  * Implement a keybind to show/hide the overlay
-* **Dynamic Text Elements**: Enable changes to text elements (e.g., total days) in OBS without manual updates.
+
+- [ ] **Configurable Week-End & Month-End Recording Toggles**  
+  (Feature implemented, just needs UI setting)
+
+- [ ] **OBS Scene Switching**  
+  Automatically change scenes based on in-game season, event, or time
+
+- [ ] **Event Notification System**  
+  Reminders for birthdays, festivals, quest deadlines, etc.
+
+- [ ] **Overlay Integration (Tracker View)**  
+  Add a live completion sidebar overlay in OBS  
+  Inspired by this tracker: [Example Image](https://i.ytimg.com/vi/M9rPRjzbvWM/maxresdefault.jpg)
+
+- [ ] **Dynamic Text Stats**  
+  Display gold earned, days played, crops grown, etc. as live OBS overlays
+
+---
+
+## ❤️ Developer Note
+
+I'm currently trying out some new techniques for managing ADHD and avoiding burnout. That means updates may be paced out more intentionally. Expect the next one in about a week—thanks for your patience and support!
