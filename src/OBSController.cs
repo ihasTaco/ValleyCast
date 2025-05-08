@@ -121,45 +121,62 @@ namespace ValleyCast {
             }
         }
 
-        private static void HandleEvent(JToken data) {
+        private async void HandleEvent(JToken data) {
             // These events are the ones that I think I will need to get the mod to a point I think is finished.
             // just in case I need to add more, https://github.com/obsproject/obs-websocket/blob/master/docs/generated/protocol.md#events
             // These Event handlers are all placeholders for now, eventually I will add functionality to actually do stuff with these
-            if (data["eventType"]?.ToString() == "ExitStarted") {
+            if (data["eventType"]?.ToString() == "ExitStarted")
+            {
                 ModEntry.ModMonitor.Log("OBS is exiting.", StardewModdingAPI.LogLevel.Debug);
-            } else if (data["eventType"]?.ToString() == "SceneCreated") {
+            }
+            else if (data["eventType"]?.ToString() == "SceneCreated")
+            {
                 ModEntry.ModMonitor.Log("A new scene was created", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"| Scene Name | {data["eventData"]!["sceneName"]}", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"| Scene UUID | {data["eventData"]!["sceneUuid"]}", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"|   Is Group | {data["eventData"]!["isGroup"]}", StardewModdingAPI.LogLevel.Debug);
-            } else if (data["eventType"]?.ToString() == "SceneRemoved") {
+            }
+            else if (data["eventType"]?.ToString() == "SceneRemoved")
+            {
                 ModEntry.ModMonitor.Log("A scene was removed", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"| Scene Name | {data["eventData"]!["sceneName"]}", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"| Scene UUID | {data["eventData"]!["sceneUuid"]}", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"|   Is Group | {data["eventData"]!["isGroup"]}", StardewModdingAPI.LogLevel.Debug);
-            } else if (data["eventType"]?.ToString() == "SceneNameChanged") {
+            }
+            else if (data["eventType"]?.ToString() == "SceneNameChanged")
+            {
                 ModEntry.ModMonitor.Log("A scene name was changed", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"| Scene UUID | {data["eventData"]!["sceneUuid"]}", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"|   Old Name | {data["eventData"]!["oldSceneName"]}", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"|   New Name | {data["eventData"]!["sceneName"]}", StardewModdingAPI.LogLevel.Debug);
-            } else if (data["eventType"]?.ToString() == "SceneListChanged") {
+            }
+            else if (data["eventType"]?.ToString() == "SceneListChanged")
+            {
                 ModEntry.ModMonitor.Log("The scene list was changed", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"|     Scenes | {String.Join(" |", data["eventData"]!["scenes"]!)}", StardewModdingAPI.LogLevel.Debug);
-            } else if (data["eventType"]?.ToString() == "InputCreated") {
+            }
+            else if (data["eventType"]?.ToString() == "InputCreated")
+            {
                 ModEntry.ModMonitor.Log("A new input was created", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"| Input Name | {data["eventData"]!["inputName"]}", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"| Input UUID | {data["eventData"]!["inputUuid"]}", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"| Input Kind | {data["eventData"]!["inputKind"]}", StardewModdingAPI.LogLevel.Debug);
-            } else if (data["eventType"]?.ToString() == "InputRemoved") {
+            }
+            else if (data["eventType"]?.ToString() == "InputRemoved")
+            {
                 ModEntry.ModMonitor.Log("An input name was removed", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"| Input Name | {data["eventData"]!["inputName"]}", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"| Input UUID | {data["eventData"]!["inputUuid"]}", StardewModdingAPI.LogLevel.Debug);
-            } else if (data["eventType"]?.ToString() == "InputNameChanged") {
+            }
+            else if (data["eventType"]?.ToString() == "InputNameChanged")
+            {
                 ModEntry.ModMonitor.Log("An input name was changed", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"| Input UUID | {data["eventData"]!["inputUuid"]}", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"|   Old Name | {data["eventData"]!["oldInputName"]}", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"|   New Name | {data["eventData"]!["inputName"]}", StardewModdingAPI.LogLevel.Debug);
-            } else if (data["eventType"]?.ToString() == "SceneItemCreated") {
+            }
+            else if (data["eventType"]?.ToString() == "SceneItemCreated")
+            {
                 ModEntry.ModMonitor.Log("A scene item was created", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"| Scene Name | {data["eventData"]!["sceneName"]}", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"| Scene UUID | {data["eventData"]!["sceneUuid"]}", StardewModdingAPI.LogLevel.Debug);
@@ -167,24 +184,48 @@ namespace ValleyCast {
                 ModEntry.ModMonitor.Log($"|   Src UUID | {data["eventData"]!["sourceUuid"]}", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"|     Src ID | {data["eventData"]!["sceneItemId"]}", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"|  Src Index | {data["eventData"]!["sceneItemIndex"]}", StardewModdingAPI.LogLevel.Debug);
-            } else if (data["eventType"]?.ToString() == "SceneItemRemoved") {
+            }
+            else if (data["eventType"]?.ToString() == "SceneItemRemoved")
+            {
                 ModEntry.ModMonitor.Log("A scene item was removed", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"| Scene Name | {data["eventData"]!["sceneName"]}", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"| Scene UUID | {data["eventData"]!["sceneUuid"]}", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"|   Src Name | {data["eventData"]!["sourceName"]}", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"|   Src UUID | {data["eventData"]!["sourceUuid"]}", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"|     Src ID | {data["eventData"]!["sceneItemId"]}", StardewModdingAPI.LogLevel.Debug);
-            } else if (data["eventType"]?.ToString() == "StreamStateChanged") {
+            }
+            else if (data["eventType"]?.ToString() == "StreamStateChanged")
+            {
                 ModEntry.ModMonitor.Log("Stream state has changed", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"|  Is Active | {data["eventData"]!["outputActive"]}", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"|      State | {data["eventData"]!["outputState"]}", StardewModdingAPI.LogLevel.Debug);
-            } else if (data["eventType"]?.ToString() == "RecordingStateChanged") {
+            } else if (data["eventType"]?.ToString() == "RecordStateChanged") {
+                string state = data["eventData"]?["outputState"]?.ToString() ?? "";
+                bool isActive = data["eventData"]?["outputActive"]?.Value<bool>() ?? false;
+
                 ModEntry.ModMonitor.Log("Recording state has changed", StardewModdingAPI.LogLevel.Debug);
-                ModEntry.ModMonitor.Log($"|  Is Active | {data["eventData"]!["outputActive"]}", StardewModdingAPI.LogLevel.Debug);
-                ModEntry.ModMonitor.Log($"|      State | {data["eventData"]!["outputState"]}", StardewModdingAPI.LogLevel.Debug);
-                ModEntry.ModMonitor.Log($"|       Path | {data["eventData"]!["outputPath"]}", StardewModdingAPI.LogLevel.Debug);
+                ModEntry.ModMonitor.Log($"|  Is Active | {isActive}", StardewModdingAPI.LogLevel.Debug);
+                ModEntry.ModMonitor.Log($"|      State | {state}", StardewModdingAPI.LogLevel.Debug);
+                ModEntry.ModMonitor.Log($"|       Path | {data["eventData"]?["outputPath"]}", StardewModdingAPI.LogLevel.Debug);
+
+                if (state == "OBS_WEBSOCKET_OUTPUT_STOPPED")
+                {
+                    if (state == "OBS_WEBSOCKET_OUTPUT_STOPPED")
+                    {
+                        if (!ModEntry.IsRestartingRecording)
+                        {
+                            await ModEntry.AskRecord(); // ✅ Use the centralized logic
+                        }
+                        else
+                        {
+                            ModEntry.ModMonitor.Log("Suppressing disconnect notification due to RestartRecord()", StardewModdingAPI.LogLevel.Trace);
+                        }
+                    }
+                }
+
+                ModEntry.IsRecording = isActive;
             } else if (data["eventType"]?.ToString() == "RecordFileChanged") {
-                ModEntry.ModMonitor.Log("Recording state has changed", StardewModdingAPI.LogLevel.Debug);
+                ModEntry.ModMonitor.Log("Recording file has changed", StardewModdingAPI.LogLevel.Debug);
                 ModEntry.ModMonitor.Log($"|   New Path | {data["eventData"]!["newOutputPath"]}", StardewModdingAPI.LogLevel.Debug);
             }
         }
@@ -325,7 +366,19 @@ namespace ValleyCast {
                 await Connect(); // Attempt to reconnect
             } else {
                 ModEntry.ModMonitor.Log($"Failed to reconnect to OBS after {maxReconnectAttempts} attempts.", StardewModdingAPI.LogLevel.Error);
-                Game1.activeClickableMenu = new DialogueBox(ModEntry.Config.ConnNotifMessageDisconnect);
+                PlayerNotify.Dialogue(
+                    ModEntry.Config.ConnNotifMessageDisconnect,
+                    new List<Response> {
+                        new("1", "Try Again"),
+                        new("2", "Ignore it for now")
+                    },
+                    async answer => {
+                        if (answer == "1")
+                        {
+                            await Connect(); // Give them another chance to reconnect
+                        }
+                    }
+                );
                 currentReconnectAttempt = 0;
             }
         }

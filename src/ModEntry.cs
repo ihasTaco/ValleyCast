@@ -13,6 +13,7 @@ namespace ValleyCast {
         public static bool IsRecording { get; set; } = false;
         public static bool IsStreaming { get; set; } = false;
         public static bool IsConnected { get; set; } = false;
+        public static bool IsRestartingRecording { get; set; } = false;
 
         public override void Entry(IModHelper helper) {
             Helper = helper;
@@ -81,18 +82,17 @@ namespace ValleyCast {
 
                     // Here is where we should check the setting for if the user wants daily, weekly or monthly recording toggle
                     // For now we are just going to say were always going to restart recording daily
-                    if (true) {
+                    if (Config.DailyRecording)
+                    {
                         await RestartRecord();
-                    } else {
-                        // If the user doesnt want daily toggles well need to check the current day and see if its the start of a new week or new month
-                        if ((Game1.dayOfMonth - 1) % 7 == 0)
-                        {
-                            await RestartRecord();
-                        }
-                        else if (Game1.dayOfMonth == 1)
-                        {
-                            await RestartRecord();
-                        }
+                    }
+                    else if (Config.WeeklyRecording && (Game1.dayOfMonth - 1) % 7 == 0)
+                    {
+                        await RestartRecord();
+                    }
+                    else if (Config.MonthlyRecording && Game1.dayOfMonth == 1)
+                    {
+                        await RestartRecord();
                     }
                 } else {
                     ModMonitor.Log("OBS isn't recording!", StardewModdingAPI.LogLevel.Alert);
@@ -158,7 +158,7 @@ namespace ValleyCast {
             await Task.CompletedTask;
         }
 
-        private static async Task AskRecord() {
+        public static async Task AskRecord() {
             if (!IsRecording) {
                 PlayerNotify.Dialogue(
                     "Wait! OBS isn't recording! Do you want to start?",
@@ -257,6 +257,7 @@ namespace ValleyCast {
         }
 
         private static async Task RestartRecord() {
+            IsRestartingRecording = true;
             // If the user wants daily recording toggles
             ModMonitor.Log("Stopping Recording...", StardewModdingAPI.LogLevel.Alert);
             await StopRecord();
@@ -270,6 +271,7 @@ namespace ValleyCast {
 
             // This ensures the method is always asynchronous
             await Task.CompletedTask;
+            IsRestartingRecording = false;
         }
 
         // Hot reload the config

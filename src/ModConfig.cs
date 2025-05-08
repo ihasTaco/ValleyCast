@@ -15,5 +15,9 @@ namespace ValleyCast
         public string DayCounterSource { get; set; } = "DayText";
         public string DayCounterFormat { get; set; } = "Day {day}, {season}, Year {year}";
         public bool ReloadTrigger { get; set; } = false;
+
+        public bool WeeklyRecording { get; set; } = false;
+        public bool MonthlyRecording { get; set; } = false;
+        public bool DailyRecording { get; set; } = true; // default to true
     }
 }

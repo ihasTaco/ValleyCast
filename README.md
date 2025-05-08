@@ -42,22 +42,28 @@ Supports dynamic overlays, text updates, recording triggers, and more, with full
 
 ---
 
-## ✅ Features (v0.1.6)
+## ✅ Features (v0.1.7)
+
+- **NEW! | ✅ Week-End & Month-End Recording Logic**  
+  Automatically restarts recording at the start of a new day, week or month (based on config flags)
+
+- **NEW! | 🔧 Smarter Recording Prompts**  
+  No more false alerts during intentional restarts; player gets notified only when recording stops unexpectedly
 
 - **NEW! | 🔄 Hot Reload Config**  
   Reload your `config.json` in-game via F5 or a config menu toggle
 
-- **NEW! | 📝 OBS Text Source Updates**  
+- **📝 OBS Text Source Updates**  
   Automatically updates OBS text sources with in-game info like day, season, year (fully customizable)
 
 - **🎛 Integrated Mod Settings**  
   Uses GMCM to manage all mod config in-game
 
 - **🎥 OBS Recording Control**  
-  Start/stop recordings based on events like save load or day-end
+  Start/stop recordings based on events like save load, week/month transitions, or player prompts
 
 - **🔔 In-Game Notifications**  
-  Get alerts when OBS connects, disconnects, or config is reloaded
+  Get alerts when OBS connects, disconnects, or stops recording
 
 - **🪵 Robust Logging**  
   Logs all OBS communication and mod activity to SMAPI console
@@ -66,8 +72,6 @@ Supports dynamic overlays, text updates, recording triggers, and more, with full
 
 ## 🐞 Known Issues
 
-- OBS `IsRecording` check is unreliable in OBS 30+ and may not reflect the true recording state
-- Scene switching + weekly/monthly event triggers exist but aren't exposed in the UI yet
 - Not tested on macOS or Streamlabs OBS
 
 ---
@@ -76,8 +80,8 @@ Supports dynamic overlays, text updates, recording triggers, and more, with full
 
 ### Upcoming Features
 
-- [ ] **Configurable Week-End & Month-End Recording Toggles**  
-  (Feature implemented, just needs UI setting)
+- [ ] **Expose Recording Flags in Config Menu (GMCM)**  
+  Weekly and Monthly restart toggles are live but not exposed in the UI yet (edit in config.json and restart or press F5)
 
 - [ ] **OBS Scene Switching**  
   Automatically change scenes based on in-game season, event, or time
@@ -96,4 +100,4 @@ Supports dynamic overlays, text updates, recording triggers, and more, with full
 
 ## ❤️ Developer Note
 
-I'm currently trying out some new techniques for managing ADHD and avoiding burnout. That means updates may be paced out more intentionally. Expect the next one in about a week, thanks for your patience and support!
+I'm currently trying out some new techniques for managing ADHD and avoiding burnout. That means updates may be paced out more intentionally. Thanks for your patience and support! Today’s update added weekly/monthly restart support, smarter notifications, and a ton of backend polish. Expect more UI integration and scene control next. 💾
