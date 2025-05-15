@@ -12,92 +12,88 @@ Supports dynamic overlays, text updates, recording triggers, and more, with full
 - ✅ Tested with **OBS Studio v31.0.3**
 - ✅ Tested with **Stardew Valley 1.6.15**
 - 🧪 Not yet tested with Streamlabs OBS
-- 🪟 Windows only for now (May work with *unix & mac devices but haven't tested yet)
+- 🪟 Windows only (may work on Unix/macOS but untested)
 
 ---
 
 ## Getting Started
 
-### 🔗 Dependencies
+### Dependencies
 
 - [SMAPI](https://smapi.io/)
 - [Generic Mod Configuration Menu (GMCM)](https://www.nexusmods.com/stardewvalley/mods/5098)
 
-### 🛠️ Installation & Setup
+### Installation & Setup
 
 1. **Configure OBS Studio**
-   - Open OBS Studio
+   - Open OBS
    - Go to `Tools > WebSocket Server Settings`
    - Click **Show Connection Info** and keep it open
 
 2. **Launch Stardew Valley**
-   - Start the game using SMAPI
-   - Make sure GMCM is installed
+   - Start the game via SMAPI
+   - Ensure GMCM is installed
 
 3. **Configure ValleyCast In-Game**
-   - Click the ⚙️ cog icon in the bottom-left of the screen
+   - Click the gear icon in the bottom-left corner
    - Select **ValleyCast**
-   - Enter the OBS connection info (IP and Port)
-     - Default values work if OBS is running on the same device
+   - Enter the OBS IP and Port (defaults are fine for same-device use)
 
 ---
 
-## ✅ Features (v0.1.7)
+## Features
 
-- **NEW! | ✅ Week-End & Month-End Recording Logic**  
-  Automatically restarts recording at the start of a new day, week or month (based on config flags)
+### New in v0.1.8
+- **NEW:** Fixed a bug where the game would hang if OBS wasn’t open
+- **NEW:** Fixed issue where OBS scenes/text wouldn’t update when loading a save
+- **NEW:** Fixed recording prompt suppression when OBS wasn’t connected
+- **NEW:** Modularized code for better stability and extension
+- **NEW:** Scene switching based on:
+  - In-game seasons
+  - Fallback/default when no scene matches
 
-- **NEW! | 🔧 Smarter Recording Prompts**  
-  No more false alerts during intentional restarts; player gets notified only when recording stops unexpectedly
-
-- **NEW! | 🔄 Hot Reload Config**  
-  Reload your `config.json` in-game via F5 or a config menu toggle
-
-- **📝 OBS Text Source Updates**  
-  Automatically updates OBS text sources with in-game info like day, season, year (fully customizable)
-
-- **🎛 Integrated Mod Settings**  
-  Uses GMCM to manage all mod config in-game
-
-- **🎥 OBS Recording Control**  
-  Start/stop recordings based on events like save load, week/month transitions, or player prompts
-
-- **🔔 In-Game Notifications**  
-  Get alerts when OBS connects, disconnects, or stops recording
-
-- **🪵 Robust Logging**  
-  Logs all OBS communication and mod activity to SMAPI console
+### Core Features
+- Integrated Mod Settings via GMCM
+- OBS WebSocket integration for automated control
+- Week-end and month-end recording logic
+- Smarter recording prompts (only show when truly needed)
+- Hot-reload support for `config.json` (F5 or in-menu toggle)
+- OBS text source updates (season, date, year, fully customizable)
+- Automated recording control for:
+  - Save load
+  - New day/week/month
+- In-game notifications for OBS connection and recording status
+- Robust logging to SMAPI console
 
 ---
 
-## 🐞 Known Issues
+## Roadmap
 
-- Not tested on macOS or Streamlabs OBS
-
----
-
-## 🚧 Roadmap
+### Known Issues
+- On save load, the mod currently retries OBS connection up to 5 times. This will be reduced to 1 retry in the next patch.
 
 ### Upcoming Features
 
-- [ ] **Expose Recording Flags in Config Menu (GMCM)**  
-  Weekly and Monthly restart toggles are live but not exposed in the UI yet (edit in config.json and restart or press F5)
+- **Event-Triggered Scene Switching**
+  - Festivals, birthdays, etc.
 
-- [ ] **OBS Scene Switching**  
-  Automatically change scenes based on in-game season, event, or time
+- **Streaming-Safe Mode**
+  - Suppress logs and notifications while live
+  - Toggleable in config or settings
 
-- [ ] **Event Notification System**  
-  Reminders for birthdays, festivals, quest deadlines, etc.
+- **Revamped In-Game Mod Menu**
+  - Current layout is clunky and will be redesigned for clarity
 
-- [ ] **Overlay Integration (Tracker View)**  
-  Add a live completion sidebar overlay in OBS  
-  Inspired by this tracker: [Example Image](https://i.ytimg.com/vi/M9rPRjzbvWM/maxresdefault.jpg)
+- **Overlay Integration (experimental)**
+  - Visual tracker in OBS for player progress (e.g. quests, goals)
+  - Toggleable via hotkey or menu
+  - Inspired by overlays like Ship of Harkinian
+    - [Example overlay](https://i.ytimg.com/vi/M9rPRjzbvWM/maxresdefault.jpg)
 
-- [ ] **Dynamic Text Stats**  
-  Display gold earned, days played, crops grown, etc. as live OBS overlays
+- **Dynamic Text Elements**
+  - More advanced OBS text control (e.g., live quest status)
 
----
-
-## ❤️ Developer Note
-
-I'm currently trying out some new techniques for managing ADHD and avoiding burnout. That means updates may be paced out more intentionally. Thanks for your patience and support! Today’s update added weekly/monthly restart support, smarter notifications, and a ton of backend polish. Expect more UI integration and scene control next. 💾
+- **Optional Default Scene Graphics (?)**
+  - Provide a downloadable pack of simple seasonal-themed OBS scene assets (e.g. spring, summer, fall, winter)
+  - Useful for quick setup or inspiration, can be customized or replaced
+  - Will include matching text overlays for common game info (e.g., Day, Season, Year)

@@ -19,5 +19,10 @@ namespace ValleyCast
         public bool WeeklyRecording { get; set; } = false;
         public bool MonthlyRecording { get; set; } = false;
         public bool DailyRecording { get; set; } = true; // default to true
+        public string SpringScene { get; set; } = "SpringOverlay";
+        public string SummerScene { get; set; } = "SummerOverlay";
+        public string FallScene { get; set; } = "FallOverlay";
+        public string WinterScene { get; set; } = "WinterOverlay";
+        public string FallbackScene { get; set; } = "DefaultOverlay";
     }
 }

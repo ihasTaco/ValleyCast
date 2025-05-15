@@ -12,7 +12,6 @@ namespace ValleyCast {
         private readonly string password;
         private int currentReconnectAttempt;
         public int maxReconnectAttempts;
-        public bool IsRecording { get; private set; } = false;
         private TaskCompletionSource<JToken> tcs;
         private readonly Dictionary<string, TaskCompletionSource<JToken>> pendingRequests = new Dictionary<string, TaskCompletionSource<JToken>>();
 
@@ -418,6 +417,18 @@ namespace ValleyCast {
 
             ModEntry.ModMonitor.Log($"Sending OBS text update: '{text}' to source '{sourceName}'", StardewModdingAPI.LogLevel.Debug);
             await HandleOp6Requests(requestData);
+        }
+
+        public async Task<HashSet<string>> GetSceneNames() {
+            var requestData = new JObject {
+                { "requestType", "GetSceneList" },
+                { "requestId", Guid.NewGuid().ToString() }
+            };
+            var response = await HandleOp6Requests(requestData);
+            return response["responseData"]?["scenes"]
+                ?.Select(s => s?["sceneName"]?.ToString())
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .ToHashSet() ?? new HashSet<string>();
         }
     }
 }

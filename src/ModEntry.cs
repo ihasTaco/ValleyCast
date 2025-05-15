@@ -27,110 +27,39 @@ namespace ValleyCast {
             Helper.Events.GameLoop.SaveLoaded += this.OnSaveLoaded!;
             Helper.Events.GameLoop.DayStarted += this.OnDayStarted!;
         }
+        private static void InitOBSController() {
+            if (OBSController == null) {
+                OBSController = new OBSController(Config.OBSWebSocketIP, Config.OBSWebSocketPort, Config.Password, 0);
+                OBSController.maxReconnectAttempts = Config.ReconnectAttempts;
+            }
+        }
 
         private async void OnGameLaunched(object? sender, GameLaunchedEventArgs e) {
             Config = Helper.ReadConfig<ModConfig>();
             ModSettings.Settings(ModManifest);
+        }
 
+        private async void OnSaveLoaded(object? sender, SaveLoadedEventArgs e) {
             if (!Config.FirstLoad) {
-                OBSController = new OBSController(Config.OBSWebSocketIP, Config.OBSWebSocketPort, Config.Password, 0);
+                InitOBSController();
                 await OBSController.Connect();
-                OBSController.maxReconnectAttempts = Config.ReconnectAttempts;
+                await VerifyScenesExist();
             } else {
                 Config.FirstLoad = false;
                 Helper.WriteConfig(Config);
             }
-        }
 
-        private async void OnSaveLoaded(object? sender, SaveLoadedEventArgs e) {
-            if (!IsConnected) {
-                ModMonitor.Log("OBS isn't Connected!", StardewModdingAPI.LogLevel.Warn);
-                await AskConnect();
-                if (!IsConnected) { return; }
-            }
-            await CheckOBSStatus();
-
-            // TODO: Add a setting in case the user wants to suppress recording notifications while streaming
-            // for now it will always ask
-            #pragma warning disable CS0162 // Disable the unreachable code warning
-            if (true) {
-                if (IsRecording) {
-                    ModMonitor.Log("OBS is recording!", StardewModdingAPI.LogLevel.Alert);
-                } else {
-                    ModMonitor.Log("OBS isn't recording! Asking player if they want to record!", StardewModdingAPI.LogLevel.Alert);
-                    await AskRecord();
-                }
-            } else {
-                if (IsRecording) {
-                    ModMonitor.Log("OBS is recording!", StardewModdingAPI.LogLevel.Alert);
-                } else {
-                    ModMonitor.Log("OBS isn't recording, but the player has turned on 'suppress record notifications while streaming' setting!", StardewModdingAPI.LogLevel.Alert);
-                }
-            }
-            #pragma warning restore CS0162 // Re-enable the warning
+            await EnsureOBSConnectedAndPromptIfIdle();
+            await SyncOBSStateForCurrentDay();
         }
 
         private async void OnDayStarted(object? sender, DayStartedEventArgs e) {
-            if (!IsConnected) { return; }
-            await CheckOBSStatus();
-
-            #pragma warning disable CS0162 // Disable the unreachable code warning
-            // for now it will always ask
-            if (true) {
-                if (IsRecording){
-                    // I would like to create recording chapters via CreateRecordChapter here
-
-                    // Here is where we should check the setting for if the user wants daily, weekly or monthly recording toggle
-                    // For now we are just going to say were always going to restart recording daily
-                    if (Config.DailyRecording)
-                    {
-                        await RestartRecord();
-                    }
-                    else if (Config.WeeklyRecording && (Game1.dayOfMonth - 1) % 7 == 0)
-                    {
-                        await RestartRecord();
-                    }
-                    else if (Config.MonthlyRecording && Game1.dayOfMonth == 1)
-                    {
-                        await RestartRecord();
-                    }
-                } else {
-                    ModMonitor.Log("OBS isn't recording!", StardewModdingAPI.LogLevel.Alert);
-                }
-
-                // Update the day counter text
-                string formattedText = Config.DayCounterFormat
-                    .Replace("{day}", Game1.dayOfMonth.ToString())
-                    .Replace("{season}", Game1.currentSeason)
-                    .Replace("{year}", Game1.year.ToString());
-
-                await OBSController.UpdateDayText(Config.DayCounterSource, formattedText);
-            } else {
-                if (IsRecording) {
-                    // I would like to create recording chapters via CreateRecordChapter here
-
-                    // Here is where we should check the setting for if the user wants daily, weekly or monthly recording toggle
-                    // For now we are just going to say were always going to restart recording daily
-                    if (true) {
-                        await RestartRecord();
-                    } else {
-                        // If the user doesnt want daily toggles well need to check the current day and see if its the start of a new week or new month
-                        if ((Game1.dayOfMonth - 1) % 7 == 0) {
-                            // I would like to create recording chapters via CreateRecordChapter here
-                            await RestartRecord();
-                        } else if (Game1.dayOfMonth == 1) {
-                            await RestartRecord();
-                        }
-                    }
-                } else {
-                    ModMonitor.Log("OBS isn't recording!", StardewModdingAPI.LogLevel.Alert);
-                }
-            }
-            #pragma warning restore CS0162 // Re-enable the warning
+            if (!IsConnected) return;
+            await EnsureOBSConnectedAndPromptIfIdle();
+            await SyncOBSStateForCurrentDay();
         }
 
-        private static async Task CheckOBSStatus()
-        {
+        private static async Task CheckOBSStatus() {
             // Check if OBS is recording
             var requestData = new JObject {
                 { "requestType", "GetRecordStatus" },
@@ -154,8 +83,33 @@ namespace ValleyCast {
             
             // If the response outputActive is null then set it false if its available then use the response
             IsStreaming = response["responseData"]?["outputActive"]?.Value<bool>() ?? false;
+        }
 
-            await Task.CompletedTask;
+        private static async Task EnsureOBSConnectedAndPromptIfIdle() {
+            // TODO: When streaming logic is added, consider checking:
+            // if (IsStreaming && Config.SuppressRecordPromptWhileStreaming) return;
+
+            if (!IsConnected) {
+                ModMonitor.Log("OBS not connected. Prompting connection...", StardewModdingAPI.LogLevel.Warn);
+                await AskConnect();
+
+                // Give OBS a moment to finish handshaking
+                await Task.Delay(500);
+            }
+
+            if (!IsConnected) {
+                ModMonitor.Log("OBS connection failed or canceled. Skipping further prompts.", StardewModdingAPI.LogLevel.Warn);
+                return;
+            }
+
+            await CheckOBSStatus();
+
+            if (!IsRecording) {
+                ModMonitor.Log("OBS is connected but not recording. Prompting player...", StardewModdingAPI.LogLevel.Alert);
+                await AskRecord();
+            } else {
+                ModMonitor.Log("OBS is already recording. No action needed.", StardewModdingAPI.LogLevel.Info);
+            }
         }
 
         public static async Task AskRecord() {
@@ -173,29 +127,37 @@ namespace ValleyCast {
                     }
                 );
             }
-
-            await Task.CompletedTask;
         }
 
         private static async Task AskConnect() {
-            if (!IsRecording) {
-                PlayerNotify.Dialogue(
-                    "Wait! OBS isn't connected! Do you want to connect?",
-                    new List<Response> {
-                        new ("1", "Yes! Good catch!"),
-                        new ("2", "Nah. It's fine.")
-                    },
-                    async answer => {
-                        if (answer == "1")
-                        {
-                            await OBSController.Connect();
+            if (IsConnected) return;
+
+            PlayerNotify.Dialogue(
+                "Wait! OBS isn't connected! Do you want to connect?",
+                new List<Response> {
+                    new ("1", "Yes! Good catch!"),
+                    new ("2", "Nah. It's fine.")
+                },
+                async answer => {
+                    if (answer == "1") {
+                        await OBSController.Connect();
+
+                        // Give the websocket time to process the Identify response
+                        await Task.Delay(250);
+
+                        if (IsConnected) {
+                            ModMonitor.Log("✅ OBS connection established after player confirmed. Proceeding to check recording status.", StardewModdingAPI.LogLevel.Info);
+                            await CheckOBSStatus();
+
+                            if (!IsRecording) {
+                                await AskRecord();
+                            }
+                        } else {
+                            ModMonitor.Log("❌ OBS connection failed after player confirmed. Skipping AskRecord().", StardewModdingAPI.LogLevel.Warn);
                         }
                     }
-                );
-            }
-
-            // This ensures the method is always asynchronous
-            await Task.CompletedTask;
+                }
+            );
         }
 
         private static async Task StartRecord() {
@@ -209,21 +171,14 @@ namespace ValleyCast {
             // If the response outputActive is null then set it false if its available then use the response
             IsRecording = response["responseData"]?["outputActive"]?.Value<bool>() ?? false;
 
-            if (IsRecording)
-            {
+            if (IsRecording) {
                 ModMonitor.Log("OBS is now recording!", StardewModdingAPI.LogLevel.Alert);
-            }
-            else
-            {
+            } else {
                 ModMonitor.Log($"Uh Oh! OBS is not recording! Comments: {response["responseData"]?["comment"]}", StardewModdingAPI.LogLevel.Alert);
             }
-
-            // This ensures the method is always asynchronous
-            await Task.CompletedTask;
         }
 
-        private static async Task StopRecord()
-        {
+        private static async Task StopRecord() {
             ModMonitor.Log("Sending Stop Record Request.", StardewModdingAPI.LogLevel.Alert);
             var requestData = new JObject {
                 { "requestType", "StopRecord" },
@@ -252,12 +207,11 @@ namespace ValleyCast {
             ModMonitor.Log($"OBS has stopped recording! Output Path: {response["responseData"]?["outputPath"]}", StardewModdingAPI.LogLevel.Alert);
 
             IsRecording = false;
-
-            await Task.CompletedTask;
         }
 
         private static async Task RestartRecord() {
             IsRestartingRecording = true;
+
             // If the user wants daily recording toggles
             ModMonitor.Log("Stopping Recording...", StardewModdingAPI.LogLevel.Alert);
             await StopRecord();
@@ -269,8 +223,6 @@ namespace ValleyCast {
 
             ModMonitor.Log("Recording has been restarted!", StardewModdingAPI.LogLevel.Alert);
 
-            // This ensures the method is always asynchronous
-            await Task.CompletedTask;
             IsRestartingRecording = false;
         }
 
@@ -281,14 +233,14 @@ namespace ValleyCast {
             ModMonitor.Log("Config reloaded!", StardewModdingAPI.LogLevel.Info);
 
             // Immediately update the OBS text after reloading
-            if (IsConnected)
-            {
+            if (IsConnected) {
                 string formattedText = Config.DayCounterFormat
                     .Replace("{day}", Game1.dayOfMonth.ToString())
                     .Replace("{season}", Game1.currentSeason)
                     .Replace("{year}", Game1.year.ToString());
 
                 _ = OBSController.UpdateDayText(Config.DayCounterSource, formattedText);
+                _ = VerifyScenesExist();
             }
         }
 
@@ -301,6 +253,90 @@ namespace ValleyCast {
                 ReloadConfig();
                 Game1.addHUDMessage(new HUDMessage("Config reloaded!", HUDMessage.newQuest_type));
             }
+        }
+
+        private static async Task VerifyScenesExist() {
+            var scenes = await OBSController.GetSceneNames();
+
+            if (scenes == null) {
+                ModMonitor.Log("⚠️ Could not retrieve scene list from OBS.", StardewModdingAPI.LogLevel.Error);
+                return;
+            }
+
+            var expectedScenes = new[] {
+                Config.SpringScene,
+                Config.SummerScene,
+                Config.FallScene,
+                Config.WinterScene
+            };
+
+            foreach (var sceneName in expectedScenes) {
+                if (!scenes.Contains(sceneName)) {
+                    ModMonitor.Log($"❌ Missing OBS scene: '{sceneName}' not found!", StardewModdingAPI.LogLevel.Warn);
+                    PlayerNotify.Popup($"Missing OBS scene: {sceneName}", HUDMessage.error_type);
+                } else {
+                    ModMonitor.Log($"✅ Found OBS scene: {sceneName}", StardewModdingAPI.LogLevel.Trace);
+                }
+            }
+        }
+
+        private static async Task SyncOBSStateForCurrentDay() {
+            if (!IsConnected) { return; }
+            ModMonitor.Log("🔄 Syncing OBS state for current day...", StardewModdingAPI.LogLevel.Trace);
+            await CheckOBSStatus();
+
+            // Recording logic
+            if (IsRecording && ShouldRestartRecording()) {
+                await RestartRecord();
+            } else {
+                ModMonitor.Log("OBS isn't recording!", StardewModdingAPI.LogLevel.Alert);
+            }
+
+            // Day counter text
+            string formattedText = Config.DayCounterFormat
+                .Replace("{day}", Game1.dayOfMonth.ToString())
+                .Replace("{season}", Game1.currentSeason)
+                .Replace("{year}", Game1.year.ToString());
+
+            await OBSController.UpdateDayText(Config.DayCounterSource, formattedText);
+
+            // Scene switching
+            string sceneToSwitch = Game1.currentSeason switch {
+                "spring" => Config.SpringScene,
+                "summer" => Config.SummerScene,
+                "fall" => Config.FallScene,
+                "winter" => Config.WinterScene,
+                _ => null
+            };
+
+            if (string.IsNullOrWhiteSpace(sceneToSwitch)) { return; }
+
+            var scenes = await OBSController.GetSceneNames();
+
+            string finalScene = scenes != null && scenes.Contains(sceneToSwitch) ? sceneToSwitch : Config.FallbackScene;
+
+            if (!scenes.Contains(sceneToSwitch)) {
+                ModMonitor.Log($"⚠️ Scene '{sceneToSwitch}' not found. Falling back to '{finalScene}'", StardewModdingAPI.LogLevel.Warn);
+                PlayerNotify.Popup($"Scene missing: {sceneToSwitch}. Using fallback.", HUDMessage.error_type);
+            }
+
+            var switchRequest = new JObject {
+                { "requestType", "SetCurrentProgramScene" },
+                { "requestId", Guid.NewGuid().ToString() },
+                { "requestData", new JObject {
+                    { "sceneName", finalScene }
+                }}
+            };
+
+            await OBSController.HandleOp6Requests(switchRequest);
+            ModMonitor.Log($"✅ Switched OBS scene to '{finalScene}'", StardewModdingAPI.LogLevel.Info);
+        }
+
+        private static bool ShouldRestartRecording() {
+            if (Config.DailyRecording) return true;
+            if (Config.WeeklyRecording && (Game1.dayOfMonth - 1) % 7 == 0) return true;
+            if (Config.MonthlyRecording && Game1.dayOfMonth == 1) return true;
+            return false;
         }
     }
 }

@@ -127,6 +127,13 @@ namespace ValleyCast {
                     }
                 }
             );
+            configMenu.AddTextOption(
+                mod: ModManifest,
+                name: () => "Fallback Scene Name",
+                tooltip: () => "Scene to switch to if the seasonal scene is missing or invalid.",
+                getValue: () => ModEntry.Config.FallbackScene,
+                setValue: value => ModEntry.Config.FallbackScene = value
+            );
         }
     }
 }
